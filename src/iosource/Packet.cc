@@ -4,6 +4,9 @@
 #include "IP.h"
 #include "iosource/Manager.h"
 
+// FOR LLPOC: include llanalyzer manager to call packet loop
+#include "llanalyzer/Manager.h"
+
 extern "C" {
 #include <pcap.h>
 #ifdef HAVE_NET_ETHERNET_H
@@ -55,6 +58,9 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 	l3_proto = L3_UNKNOWN;
 	l3_checksummed = false;
 
+	// for llanalyzer: cur_pos points to the next payload
+	cur_pos = data;
+
 	if ( data && cap_len < hdr_size )
 		{
 		Weird("truncated_link_header");
@@ -62,7 +68,8 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 		}
 
 	if ( data )
-		ProcessLayer2();
+		l2_valid = true;
+	llanalyzer_mgr->processPacket(this);
 	}
 
 const IP_Hdr Packet::IP() const

@@ -121,6 +121,7 @@ void NetSessions::Done()
 void NetSessions::NextPacket(double t, const Packet* pkt)
 	{
 	SegmentProfiler prof(segment_logger, "dispatching-packet");
+//    DBG_LOG(DBG_LLPOC, "[LAYER 3] Next packet with ts=%f has layer 3 protocol %d", pkt->time, pkt->l3_proto);
 
 	if ( raw_packet )
 		mgr.Enqueue(raw_packet, IntrusivePtr{AdoptRef{}, pkt->BuildPktHdrVal()});

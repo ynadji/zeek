@@ -1,0 +1,4 @@
+[package]
+script_dir = scripts/Demo/Foo
+build_command = ./configure && make
+test_command = cd tests && btest

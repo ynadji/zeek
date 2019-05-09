@@ -145,6 +145,11 @@ public:
 	void Describe(ODesc* d) const;
 
 	/**
+	 * Wrapper to generate a packet-level weird.
+	 */
+	void Weird(const char* name);
+
+	/**
 	 * Maximal length of a layer 2 address.
 	 */
 	static const int l2_addr_len = 6;
@@ -157,6 +162,7 @@ public:
 	uint32_t len;			/// Actual length on wire
 	uint32_t cap_len;			/// Captured packet length
 	uint32_t link_type;		/// pcap link_type (DLT_EN10MB, DLT_RAW, etc)
+    const uint8_t* cur_pos; /// Current pointer to the start of unanalyzed payload data in the raw packet, used by llanalyzers
 
 	// These are computed from Layer 2 data. These fields are only valid if
 	// Layer2Valid() returns true.
@@ -216,9 +222,6 @@ public:
 private:
 	// Calculate layer 2 attributes.
 	void ProcessLayer2();
-
-	// Wrapper to generate a packet-level weird.
-	void Weird(const char* name);
 
 	// Renders an MAC address into its ASCII representation.
 	Val* FmtEUI48(const u_char *mac) const;

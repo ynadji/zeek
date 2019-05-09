@@ -14,6 +14,7 @@ DebugLogger::Stream DebugLogger::streams[NUM_DBGS] = {
 	{ "serial", 0, false }, { "rules", 0, false },
 	{ "string", 0, false },
 	{ "notifiers", 0, false },  { "main-loop", 0, false },
+    { "llpoc", 0, false},
 	{ "dpd", 0, false }, { "tm", 0, false },
 	{ "logging", 0, false }, {"input", 0, false },
 	{ "threading", 0, false }, { "file_analysis", 0, false },

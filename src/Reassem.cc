@@ -121,6 +121,7 @@ DataBlockList::Insert(uint64_t seq, uint64_t upper, const u_char* data,
 		return Insert(seq, upper, data, block_map.end());
 
 	const auto& last = block_map.rbegin()->second;
+//	std::cout << "--------------\n* Block Data *\n--------------" << std::endl << data << std::endl;
 
 	// Special check for the common case of appending to the end.
 	if ( seq == last.upper )
@@ -384,4 +385,3 @@ uint64_t Reassembler::MemoryAllocation(ReassemblerType rtype)
 	{
 	return Reassembler::sizes[rtype];
 	}
-
