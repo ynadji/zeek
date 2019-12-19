@@ -75,7 +75,7 @@ static string find_relative_file(const string& filename, const string& ext)
 		return string();
 
 	if ( filename[0] == '.' )
-		return find_file(filename, SafeDirname(::filename).result, ext);
+		return find_file(filename, SafeDirname(::filename ? ::filename : "").result, ext);
 	else
 		return find_file(filename, bro_path(), ext);
 	}
@@ -86,7 +86,7 @@ static string find_relative_script_file(const string& filename)
 		return string();
 
 	if ( filename[0] == '.' )
-		return find_script_file(filename, SafeDirname(::filename).result);
+		return find_script_file(filename, SafeDirname(::filename ? ::filename : "").result);
 	else
 		return find_script_file(filename, bro_path());
 	}
@@ -324,7 +324,7 @@ when	return TOK_WHEN;
 @DEBUG	return TOK_DEBUG;	// marks input for debugger
 
 @DIR	{
-	string rval = SafeDirname(::filename).result;
+	string rval = SafeDirname(::filename ? ::filename : "").result;
 
 	if ( ! rval.empty() && rval[0] == '.' )
 		{
@@ -340,7 +340,7 @@ when	return TOK_WHEN;
 	}
 
 @FILENAME	{
-	RET_CONST(new StringVal(SafeBasename(::filename).result));
+	RET_CONST(new StringVal(SafeBasename(::filename ? ::filename : "").result));
 	}
 
 @load{WS}{FILE}	{
