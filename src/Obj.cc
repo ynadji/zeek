@@ -59,7 +59,7 @@ BroObj::~BroObj()
 	delete location;
 	}
 
-void BroObj::Warn(const char* msg, const BroObj* obj2, int pinpoint_only, const Location* expr_location) const
+void BroObj::Warn(string_view msg, const BroObj* obj2, int pinpoint_only, const Location* expr_location) const
 	{
 	ODesc d;
 	DoMsg(&d, msg, obj2, pinpoint_only, expr_location);
@@ -67,7 +67,7 @@ void BroObj::Warn(const char* msg, const BroObj* obj2, int pinpoint_only, const 
 	reporter->PopLocation();
 	}
 
-void BroObj::Error(const char* msg, const BroObj* obj2, int pinpoint_only, const Location* expr_location) const
+void BroObj::Error(string_view msg, const BroObj* obj2, int pinpoint_only, const Location* expr_location) const
 	{
 	if ( suppress_errors )
 		return;
@@ -78,16 +78,16 @@ void BroObj::Error(const char* msg, const BroObj* obj2, int pinpoint_only, const
 	reporter->PopLocation();
 	}
 
-void BroObj::BadTag(const char* msg, const char* t1, const char* t2) const
+void BroObj::BadTag(string_view msg, string_view t1, string_view t2) const
 	{
 	char out[512];
 
-	if ( t2 )
-		snprintf(out, sizeof(out), "%s (%s/%s)", msg, t1, t2);
-	else if ( t1 )
-		snprintf(out, sizeof(out), "%s (%s)", msg, t1);
+	if ( ! t2.empty() )
+		snprintf(out, sizeof(out), "%s (%s/%s)", msg.data(), t1.data(), t2.data());
+	else if ( ! t1.empty() )
+		snprintf(out, sizeof(out), "%s (%s)", msg.data(), t1.data());
 	else
-		snprintf(out, sizeof(out), "%s", msg);
+		snprintf(out, sizeof(out), "%s", msg.data());
 
 	ODesc d;
 	DoMsg(&d, out);
@@ -95,7 +95,7 @@ void BroObj::BadTag(const char* msg, const char* t1, const char* t2) const
 	reporter->PopLocation();
 	}
 
-void BroObj::Internal(const char* msg) const
+void BroObj::Internal(string_view msg) const
 	{
 	ODesc d;
 	DoMsg(&d, msg);
@@ -109,7 +109,7 @@ void BroObj::Internal(const char* msg) const
 	reporter->PopLocation();
 	}
 
-void BroObj::InternalWarning(const char* msg) const
+void BroObj::InternalWarning(string_view msg) const
 	{
 	ODesc d;
 	DoMsg(&d, msg);
@@ -158,12 +158,12 @@ void BroObj::UpdateLocationEndInfo(const Location& end)
 	location->last_column = end.last_column;
 	}
 
-void BroObj::DoMsg(ODesc* d, const char s1[], const BroObj* obj2,
+void BroObj::DoMsg(ODesc* d, string_view s1, const BroObj* obj2,
 			int pinpoint_only, const Location* expr_location) const
 	{
 	d->SetShort();
 
-	d->Add(s1);
+	d->Add(s1.data());
 	PinPoint(d, obj2, pinpoint_only);
 
 	const Location* loc2 = 0;
