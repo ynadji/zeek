@@ -586,8 +586,8 @@ MIME_Entity::~MIME_Entity()
 	delete content_encoding_str;
 	delete multipart_boundary;
 
-	for ( unsigned int i = 0; i < headers.size(); ++i )
-		delete headers[i];
+	for ( auto& header : headers )
+		delete header;
 	headers.clear();
 
 	delete base64_decoder;
@@ -1277,10 +1277,8 @@ void MIME_Entity::IllegalEncoding(const char* explanation)
 void MIME_Entity::DebugPrintHeaders()
 	{
 #ifdef DEBUG_BRO
-	for ( unsigned int i = 0; i < headers.size(); ++i )
+	for ( MIME_Header* h : headers )
 		{
-		MIME_Header* h = headers[i];
-
 		DEBUG_fputs(h->get_name(), stderr);
 		DEBUG_MSG(":\"");
 		DEBUG_fputs(h->get_value(), stderr);
@@ -1301,7 +1299,7 @@ TableVal* MIME_Message::BuildHeaderTable(MIME_HeaderList& hlist)
 	{
 	TableVal* t = new TableVal(mime_header_list);
 
-	for ( unsigned int i = 0; i < hlist.size(); ++i )
+	for ( size_t i = 0; i < hlist.size(); ++i )
 		{
 		Val* index = val_mgr->GetCount(i+1);	// index starting from 1
 

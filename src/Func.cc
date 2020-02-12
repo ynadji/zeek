@@ -191,9 +191,9 @@ TraversalCode Func::Traverse(TraversalCallback* cb) const
 		tc = scope->Traverse(cb);
 		HANDLE_TC_STMT_PRE(tc);
 
-		for ( unsigned int i = 0; i < bodies.size(); ++i )
+		for ( const auto& body : bodies )
 			{
-			tc = bodies[i].stmts->Traverse(cb);
+			tc = body.stmts->Traverse(cb);
 			HANDLE_TC_STMT_PRE(tc);
 			}
 		}
@@ -577,10 +577,10 @@ void BroFunc::Describe(ODesc* d) const
 
 	d->NL();
 	d->AddCount(frame_size);
-	for ( unsigned int i = 0; i < bodies.size(); ++i )
+	for ( const auto& body : bodies )
 		{
-		bodies[i].stmts->AccessStats(d);
-		bodies[i].stmts->Describe(d);
+		body.stmts->AccessStats(d);
+		body.stmts->Describe(d);
 		}
 	}
 

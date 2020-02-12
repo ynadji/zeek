@@ -2725,7 +2725,7 @@ Val* IndexExpr::Fold(Val* v1, Val* v2) const
 				{
 				result->Resize(sub_length);
 
-				for ( int idx = first; idx < last; idx++ )
+				for ( bro_int_t idx = first; idx < last; idx++ )
 					result->Assign(idx - first, vect->Lookup(idx)->Ref());
 				}
 

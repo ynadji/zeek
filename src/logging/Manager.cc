@@ -1052,7 +1052,7 @@ threading::Value* Manager::ValToLogVal(Val* val, BroType* ty)
 		lval->val.set_val.size = set->Length();
 		lval->val.set_val.vals = new threading::Value* [lval->val.set_val.size];
 
-		for ( int i = 0; i < lval->val.set_val.size; i++ )
+		for ( bro_int_t i = 0; i < lval->val.set_val.size; i++ )
 			lval->val.set_val.vals[i] = ValToLogVal(set->Index(i));
 
 		Unref(set);
@@ -1066,7 +1066,7 @@ threading::Value* Manager::ValToLogVal(Val* val, BroType* ty)
 		lval->val.vector_val.vals =
 			new threading::Value* [lval->val.vector_val.size];
 
-		for ( int i = 0; i < lval->val.vector_val.size; i++ )
+		for ( bro_int_t i = 0; i < lval->val.vector_val.size; i++ )
 			{
 			lval->val.vector_val.vals[i] =
 				ValToLogVal(vec->Lookup(i),

@@ -1039,7 +1039,7 @@ VectorVal* ParaglobVal::Get(StringVal* &pattern)
 	std::string string_pattern (reinterpret_cast<const char*>(pattern->Bytes()), pattern->Len());
 
 	std::vector<std::string> matches = this->internal_paraglob->get(string_pattern);
-	for (unsigned int i = 0; i < matches.size(); i++)
+	for (size_t i = 0; i < matches.size(); i++)
 		rval->Assign(i, new StringVal(matches.at(i)));
 
 	return rval;

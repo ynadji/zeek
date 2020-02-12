@@ -299,7 +299,7 @@ int BroString::FindSubstring(const BroString* s) const
 
 BroString::Vec* BroString::Split(const BroString::IdxVec& indices) const
 	{
-	unsigned int i;
+	size_t i;
 
 	if ( indices.empty() )
 		return 0;
@@ -483,7 +483,7 @@ BroString* concatenate(BroString::Vec& v)
 
 void delete_strings(std::vector<const BroString*>& v)
 	{
-	for ( unsigned int i = 0; i < v.size(); ++i )
-		delete v[i];
+	for ( auto elem : v )
+		delete elem;
 	v.clear();
 	}

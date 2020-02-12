@@ -464,7 +464,7 @@ bool Manager::CreateEventStream(RecordVal* fval)
 		}
 
 	Field** logf = new Field*[fieldsV.size()];
-	for ( unsigned int i = 0; i < fieldsV.size(); i++ )
+	for ( size_t i = 0; i < fieldsV.size(); i++ )
 		logf[i] = fieldsV[i];
 
 	Unref(fields); // ref'd by lookupwithdefault
@@ -704,7 +704,7 @@ bool Manager::CreateTableStream(RecordVal* fval)
 		}
 
 	Field** fields = new Field*[fieldsV.size()];
-	for ( unsigned int i = 0; i < fieldsV.size(); i++ )
+	for ( size_t i = 0; i < fieldsV.size(); i++ )
 		fields[i] = fieldsV[i];
 
 	stream->pred = pred ? pred->AsFunc() : 0;

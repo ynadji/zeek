@@ -80,8 +80,8 @@ void choose_global_symbols_regex(const string& regex, vector<ID*>& choices,
 		{
 		debug_msg("There were multiple matches, please choose:\n");
 
-		for ( unsigned int i = 0; i < choices.size(); ++i )
-			debug_msg("[%d] %s\n", i+1, choices[i]->Name());
+		for ( size_t i = 0; i < choices.size(); i++ )
+			debug_msg("[%lu] %s\n", i+1, choices[i]->Name());
 
 		debug_msg("[a] All of the above\n");
 		debug_msg("[n] None of the above\n");
@@ -410,11 +410,11 @@ int dbg_cmd_break(DebugCmd cmd, const vector<string>& args)
 				  locstrings[strindex].c_str());
 			vector<ParseLocationRec> plrs =
 				parse_location_string(locstrings[strindex]);
-			for ( unsigned int i = 0; i < plrs.size(); ++i )
+			for ( const auto& plr : plrs )
 				{
 				DbgBreakpoint* bp = new DbgBreakpoint();
 				bp->SetID(g_debugger_state.NextBPID());
-				if ( ! bp->SetLocation(plrs[i], locstrings[strindex]) )
+				if ( ! bp->SetLocation(plr, locstrings[strindex]) )
 					{
 					debug_msg("Breakpoint not set.\n");
 					delete bp;
@@ -433,18 +433,18 @@ int dbg_cmd_break(DebugCmd cmd, const vector<string>& args)
 		{
 		// ### Implement conditions
 		string cond;
-		for ( int i = cond_index; i < int(args.size()); ++i )
+		for ( const auto& arg : args )
 			{
-			cond += args[i];
+			cond += arg;
 			cond += "    ";
 			}
 		bps[0]->SetCondition(cond);
 		}
 
-	for ( unsigned int i = 0; i < bps.size(); ++i )
+	for ( auto& bp : bps )
 		{
-		bps[i]->SetTemporary(false);
-		g_debugger_state.breakpoints[bps[i]->GetID()] = bps[i];
+		bp->SetTemporary(false);
+		g_debugger_state.breakpoints[bp->GetID()] = bp;
 		}
 
 	return 0;
@@ -505,15 +505,13 @@ int dbg_cmd_break_set_state(DebugCmd cmd, const vector<string>& args)
 		}
 	else
 		{
-		for ( unsigned int i = 0; i < args.size(); ++i )
-			if ( int idx = atoi(args[i].c_str()) )
+		for ( const auto& arg : args )
+			if ( int idx = atoi(arg.c_str()) )
 				bps_to_change.push_back(idx);
 		}
 
-	for ( unsigned int i = 0; i < bps_to_change.size(); ++i )
+	for ( auto bp_change : bps_to_change )
 		{
-		int bp_change = bps_to_change[i];
-
 		BPIDMapType::iterator result =
 			g_debugger_state.breakpoints.find(bp_change);
 
@@ -557,10 +555,10 @@ int dbg_cmd_print(DebugCmd cmd, const vector<string>& args)
 
 	// Just concatenate all the 'args' into one expression.
 	string expr;
-	for ( int i = 0; i < int(args.size()); ++i )
+	for ( size_t i = 0; i < args.size(); ++i )
 		{
 		expr += args[i];
-		if ( i < int(args.size()) - 1 )
+		if ( i < args.size() - 1 )
 			expr += " ";
 		}
 
