@@ -131,7 +131,7 @@ int TCP_Endpoint::ValidChecksum(const struct tcphdr* tp, int len) const
 		sum += htons(((const u_char*) tp)[tcp_len - 1] << 8);
 
 	sum += htons((unsigned short) tcp_len);	// fill out pseudo header
-	sum = ones_complement_checksum((void*) tp, tcp_len, sum);
+	sum = check_align_and_sum<struct tcphdr>((void*) tp, tcp_len, sum);
 
 	return sum == 0xffff;
 	}

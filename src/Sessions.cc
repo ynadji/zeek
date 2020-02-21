@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "net_util.h"
 #include "Desc.h"
 #include "Net.h"
 #include "Event.h"
@@ -252,7 +253,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 		 return;
 
 	if ( ! ignore_checksums && ip4 &&
-	     ones_complement_checksum((void*) ip4, ip_hdr_len, 0) != 0xffff )
+		check_align_and_sum<struct ip>((void*) ip4, ip_hdr_len, 0) != 0xffff )
 		{
 		Weird("bad_IP_checksum", pkt, encapsulation);
 		return;

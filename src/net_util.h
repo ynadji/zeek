@@ -143,6 +143,24 @@ extern int ones_complement_checksum(const IPAddr& a, uint32_t sum);
 extern int icmp6_checksum(const struct icmp* icmpp, const IP_Hdr* ip, int len);
 extern int icmp_checksum(const struct icmp* icmpp, int len);
 
+template <typename T>
+int check_align_and_sum(const void* p, int b, uint32_t sum)
+	{
+	if ( ( reinterpret_cast<uintptr_t>((uint16_t*)p) % alignof(T) ) == 0 )
+		{
+		sum = ones_complement_checksum(p, b, sum);
+		}
+	else
+		{
+		uint8_t* sp = new uint8_t[b];
+		memcpy(sp, p, b);
+		sum = ones_complement_checksum(sp, b, sum);
+		delete [] sp;
+		}
+
+	return sum;
+	}
+
 #ifdef ENABLE_MOBILE_IPV6
 extern int mobility_header_checksum(const IP_Hdr* ip);
 #endif
