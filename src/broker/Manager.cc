@@ -616,19 +616,6 @@ size_t Manager::FlushLogBuffers()
 	return rval;
 	}
 
-void Manager::Error(const char* format, ...)
-	{
-	va_list args;
-	va_start(args, format);
-	auto msg = vfmt(format, args);
-	va_end(args);
-
-	if ( script_scope )
-		builtin_error(msg);
-	else
-		reporter->Error("%s", msg);
-	}
-
 bool Manager::AutoPublishEvent(string topic, Val* event)
 	{
 	if ( event->Type()->Tag() != TYPE_FUNC )
