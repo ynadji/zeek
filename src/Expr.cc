@@ -3289,7 +3289,7 @@ IntrusivePtr<Val> SetConstructorExpr::InitVal(const BroType* t, IntrusivePtr<Val
 
 		if ( ! element || ! tval->Assign(element.get(), 0) )
 			{
-			Error(fmt("initialization type mismatch in set"), e);
+			Error("initialization type mismatch in set", e);
 			return nullptr;
 			}
 		}

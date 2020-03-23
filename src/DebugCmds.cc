@@ -333,7 +333,7 @@ int dbg_cmd_frame(DebugCmd cmd, const vector<string>& args)
 	// for 'list', 'break', etc.
 	const Stmt* stmt = g_frame_stack[user_frame_number]->GetNextStmt();
 	if ( ! stmt )
-		reporter->InternalError("Assertion failed: %s", "stmt != 0");
+		reporter->InternalError("Assertion failed: stmt != 0");
 
 	const Location loc = *stmt->GetLocationInfo();
 	g_debugger_state.last_loc = loc;
@@ -373,7 +373,7 @@ int dbg_cmd_break(DebugCmd cmd, const vector<string>& args)
 
 		Stmt* stmt = g_frame_stack[user_frame_number]->GetNextStmt();
 		if ( ! stmt )
-			reporter->InternalError("Assertion failed: %s", "stmt != 0");
+			reporter->InternalError("Assertion failed: stmt != 0");
 
 		DbgBreakpoint* bp = new DbgBreakpoint();
 		bp->SetID(g_debugger_state.NextBPID());
