@@ -37,3 +37,6 @@
 [submodule "aux/libkqueue"]
 	path = aux/libkqueue
 	url = https://github.com/zeek/libkqueue
+[submodule "aux/fmt"]
+	path = aux/fmt
+	url = https://github.com/zeek/fmt.git
