@@ -60,28 +60,28 @@ public:
 	// Report an informational message, nothing that needs specific
 	// attention.
 	template <typename... Args>
-	void Info(const char* fmt, Args&&... args)
+	void Info(const char* format, Args&&... args)
 		{
 		FILE* out = EmitToStderr(info_to_stderr) ? stderr : 0;
-		DoLog("", reporter_info, out, 0, 0, true, true, 0, fmt, args...);
+		DoLog("", reporter_info, out, 0, 0, true, true, 0, format, args...);
 		}
 
 	// Report a warning that may indicate a problem.
 	template <typename... Args>
-	void Warning(const char* fmt, Args&&... args)
+	void Warning(const char* format, Args&&... args)
 		{
 		FILE* out = EmitToStderr(warnings_to_stderr) ? stderr : 0;
-		DoLog("warning", reporter_warning, out, 0, 0, true, true, 0, fmt, args...);
+		DoLog("warning", reporter_warning, out, 0, 0, true, true, 0, format, args...);
 		}
 
 	// Report a non-fatal error. Processing proceeds normally after the error
 	// has been reported.
 	template <typename... Args>
-	void Error(const char* fmt, Args&&... args)
+	void Error(const char* format, Args&&... args)
 		{
 		++errors;
 		FILE* out = EmitToStderr(errors_to_stderr) ? stderr : 0;
-		DoLog("error", reporter_error, out, 0, 0, true, true, 0, fmt, args...);
+		DoLog("error", reporter_error, out, 0, 0, true, true, 0, format, args...);
 		}
 
 	// Returns the number of errors reported so far.
@@ -90,10 +90,10 @@ public:
 	// Report a fatal error. Bro will terminate after the message has been
 	// reported.
 	template <typename... Args>
-	[[noreturn]] void FatalError(const char* fmt, Args&&... args)
+	[[noreturn]] void FatalError(const char* format, Args&&... args)
 		{
 		// Always log to stderr.
-		DoLog("fatal error", 0, stderr, 0, 0, true, false, 0, fmt, args...);
+		DoLog("fatal error", 0, stderr, 0, 0, true, false, 0, format, args...);
 		set_processing_status("TERMINATED", "fatal_error");
 		fflush(stderr);
 		fflush(stdout);
@@ -103,10 +103,10 @@ public:
 	// Report a fatal error. Bro will terminate after the message has been
 	// reported and always generate a core dump.
 	template <typename... Args>
-	[[noreturn]] void FatalErrorWithCore(const char* fmt, Args&&... args)
+	[[noreturn]] void FatalErrorWithCore(const char* format, Args&&... args)
 		{
 		// Always log to stderr.
-		DoLog("fatal error", 0, stderr, 0, 0, true, false, 0, fmt, args...);
+		DoLog("fatal error", 0, stderr, 0, 0, true, false, 0, format, args...);
 		set_processing_status("TERMINATED", "fatal_error");
 		abort();
 		}
@@ -114,7 +114,7 @@ public:
 	// Report a runtime error in evaluating a Bro script expression. This
 	// function will not return but raise an InterpreterException.
 	template <typename... Args>
-	[[noreturn]] void ExprRuntimeError(const Expr* expr, const char* fmt, Args&&... args)
+	[[noreturn]] void ExprRuntimeError(const Expr* expr, const char* format, Args&&... args)
 		{
 		++errors;
 
@@ -124,7 +124,7 @@ public:
 		PushLocation(expr->GetLocationInfo());
 		FILE* out = EmitToStderr(errors_to_stderr) ? stderr : 0;
 		DoLog("expression error", reporter_error, out, 0, 0, true, true,
-			d.Description(), fmt, args...);
+			d.Description(), format, args...);
 		PopLocation();
 		throw InterpreterException();
 		}
@@ -132,12 +132,12 @@ public:
 	// Report a runtime error in evaluating a Bro script expression. This
 	// function will not return but raise an InterpreterException.
 	template <typename... Args>
-	[[noreturn]] void RuntimeError(const Location* location, const char* fmt, Args&&... args)
+	[[noreturn]] void RuntimeError(const Location* location, const char* format, Args&&... args)
 		{
 		++errors;
 		PushLocation(location);
 		FILE* out = EmitToStderr(errors_to_stderr) ? stderr : 0;
-		DoLog("runtime error", reporter_error, out, 0, 0, true, true, "", fmt, args...);
+		DoLog("runtime error", reporter_error, out, 0, 0, true, true, "", format, args...);
 		PopLocation();
 		throw InterpreterException();
 		}
@@ -152,12 +152,12 @@ public:
 	// Syslog a message. This method does nothing if we're running
 	// offline from a trace.
 	template <typename... Args>
-	void Syslog(const char* fmt, Args&&... args)
+	void Syslog(const char* format, Args&&... args)
 		{
 		if ( ! reading_traces )
 			{
 			char* buf;
-			asprintf(&buf, fmt, std::forward<Args>(args)...);
+			asprintf(&buf, format, std::forward<Args>(args)...);
 			DoSyslog(buf);
 			free(buf);
 			}
@@ -166,20 +166,20 @@ public:
 	// Report about a potential internal problem. Bro will continue
 	// normally.
 	template <typename... Args>
-	void InternalWarning(const char* fmt, Args&&... args)
+	void InternalWarning(const char* format, Args&&... args)
 		{
 		FILE* out = EmitToStderr(warnings_to_stderr) ? stderr : 0;
 		// TODO: would be nice to also log a call stack.
-		DoLog("internal warning", reporter_warning, out, 0, 0, true, true, 0, fmt, args...);
+		DoLog("internal warning", reporter_warning, out, 0, 0, true, true, 0, format, args...);
 		}
 
 	// Report an internal program error. Bro will terminate with a core
 	// dump after the message has been reported.
 	template <typename... Args>
-	[[noreturn]] void InternalError(const char* fmt, Args&&... args)
+	[[noreturn]] void InternalError(const char* format, Args&&... args)
 		{
 		// Always log to stderr.
-		DoLog("internal error", 0, stderr, 0, 0, true, false, 0, fmt, args...);
+		DoLog("internal error", 0, stderr, 0, 0, true, false, 0, format, args...);
 		set_processing_status("TERMINATED", "internal_error");
 		abort();
 		}
@@ -187,13 +187,13 @@ public:
 	// Report an analyzer error. That analyzer will be set to not process
 	// any further input, but Bro otherwise continues normally.
 	template <typename... Args>
-	void AnalyzerError(analyzer::Analyzer* a, const char* fmt, Args&&... args)
+	void AnalyzerError(analyzer::Analyzer* a, const char* format, Args&&... args)
 		{
 		SetAnalyzerSkip(a);
 
 		// Always log to stderr.
 		// TODO: would be nice to also log a call stack.
-		DoLog("analyzer error", reporter_error, stderr, 0, 0, true, true, 0, fmt, args...);
+		DoLog("analyzer error", reporter_error, stderr, 0, 0, true, true, 0, format, args...);
 		}
 
 	// Toggle whether non-fatal messages should be reported through the
@@ -345,7 +345,7 @@ private:
 	template <typename... Args>
 	void DoLog(const char* prefix, EventHandlerPtr event, FILE* out,
 		Connection* conn, val_list* addl, bool location, bool time,
-		const char* postfix, const char* fmt, Args&&... args)
+		const char* postfix, const char* format, Args&&... args)
 		{
 		static char tmp[512];
 
@@ -360,9 +360,9 @@ private:
 			int n;
 
 			if constexpr ( sizeof...(args) > 0 )
-				n = snprintf(buffer, size, fmt, std::forward<Args>(args)...);
+				n = snprintf(buffer, size, format, std::forward<Args>(args)...);
 			else
-				n = snprintf(buffer, size, "%s", fmt);
+				n = snprintf(buffer, size, "%s", format);
 
 			if ( postfix )
 				n += strlen(postfix) + 10; // Add a bit of slack.
@@ -380,7 +380,7 @@ private:
 			}
 
 		if ( postfix && *postfix )
-			// Note, if you change this fmt string, adjust the additional
+			// Note, if you change this format string, adjust the additional
 			// buffer size above.
 			snprintf(buffer + strlen(buffer), size - strlen(buffer), " (%s)", postfix);
 
