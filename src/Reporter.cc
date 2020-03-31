@@ -191,7 +191,7 @@ void Reporter::Weird(const char* name, const char* addl)
 			return;
 		}
 
-	WeirdHelper(net_weird, {new StringVal(addl)}, "%s", name);
+	WeirdHelper(net_weird, {new StringVal(addl)}, "{:s}", name);
 	}
 
 void Reporter::Weird(file_analysis::File* f, const char* name, const char* addl)
@@ -206,7 +206,7 @@ void Reporter::Weird(file_analysis::File* f, const char* name, const char* addl)
 		}
 
 	WeirdHelper(file_weird, {f->GetVal()->Ref(), new StringVal(addl)},
-	            "%s", name);
+	            "{:s}", name);
 	}
 
 void Reporter::Weird(Connection* conn, const char* name, const char* addl)
@@ -221,7 +221,7 @@ void Reporter::Weird(Connection* conn, const char* name, const char* addl)
 		}
 
 	WeirdHelper(conn_weird, {conn->BuildConnVal(), new StringVal(addl)},
-	            "%s", name);
+	            "{:s}", name);
 	}
 
 void Reporter::Weird(const IPAddr& orig, const IPAddr& resp, const char* name, const char* addl)
@@ -236,7 +236,7 @@ void Reporter::Weird(const IPAddr& orig, const IPAddr& resp, const char* name, c
 
 	WeirdHelper(flow_weird,
 	            {new AddrVal(orig), new AddrVal(resp), new StringVal(addl)},
-	            "%s", name);
+	            "{:s}", name);
 	}
 
 string Reporter::BuildLogLocationString(bool location)
@@ -280,10 +280,7 @@ string Reporter::BuildLogLocationString(bool location)
 		else if ( filename && *filename )
 			{
 			// Take from globals.
-			loc_str = filename;
-			char tmp[32];
-			snprintf(tmp, 32, "%d", line_number);
-			loc_str += string(", line ") + string(tmp);
+			loc_str = fmtlib::format("{:s}, line {:d}", filename, line_number);
 			}
 		}
 
@@ -291,7 +288,7 @@ string Reporter::BuildLogLocationString(bool location)
 	}
 
 void Reporter::DoLogEvents(const char* prefix, EventHandlerPtr event, Connection* conn,
-                           val_list* addl, bool location, bool time, char* buffer,
+                           val_list* addl, bool location, bool time, const char* buffer,
                            const string& loc_str)
 	{
 	bool raise_event = true;
@@ -303,12 +300,12 @@ void Reporter::DoLogEvents(const char* prefix, EventHandlerPtr event, Connection
 			auto locs = locations.back();
 			raise_event = PLUGIN_HOOK_WITH_RESULT(HOOK_REPORTER,
 							      HookReporter(prefix, event, conn, addl, location,
-									  locs.first, locs.second, time, buffer), true);
+								      locs.first, locs.second, time, buffer), true);
 			}
 		else
 			raise_event = PLUGIN_HOOK_WITH_RESULT(HOOK_REPORTER,
 							      HookReporter(prefix, event, conn, addl, location,
-									   nullptr, nullptr, time, buffer), true);
+								      nullptr, nullptr, time, buffer), true);
 		}
 
 	if ( raise_event && event && via_events && ! in_error_handler )
