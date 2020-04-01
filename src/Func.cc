@@ -663,7 +663,11 @@ void builtin_error(const char* msg, BroObj* arg)
 		if ( ce )
 			ce->Error(msg, arg);
 		else
-			reporter->Error(msg, arg);
+			// TODO: this used to pass arg to the error method. I still don't understand
+			// what exactly that did as it would have passed the pointer value to sprintf
+			// in Error(), likely without anything in the message as a format string to
+			// actually print anything about it.
+			reporter->Error(msg, "");
 		};
 
 
