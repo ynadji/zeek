@@ -12,12 +12,6 @@
 #include "Reporter.h"
 #include "util.h"
 
-#ifdef DEBUG
-#define DEBUG_STR(msg) DBG_LOG(DBG_STRING, msg)
-#else
-#define DEBUG_STR(msg)
-#endif
-
 const int BroString::EXPANDED_STRING;
 const int BroString::BRO_STRING_LITERAL;
 
