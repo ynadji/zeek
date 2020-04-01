@@ -73,7 +73,7 @@ void PIA::AddToBuffer(Buffer* buffer, int len, const u_char* data, bool is_orig,
 
 void PIA::ReplayPacketBuffer(analyzer::Analyzer* analyzer)
 	{
-	DBG_LOG(DBG_ANALYZER, "PIA replaying %d total packet bytes", pkt_buffer.size);
+	DBG_LOG(DBG_ANALYZER, "PIA replaying {:d} total packet bytes", pkt_buffer.size);
 
 	for ( DataBlock* b = pkt_buffer.head; b; b = b->next )
 		analyzer->DeliverPacket(b->len, b->data, b->is_orig, -1, b->ip, 0);
@@ -211,7 +211,7 @@ void PIA_TCP::FirstPacket(bool is_orig, const IP_Hdr* ip)
 	static struct tcphdr* tcp4 = 0;
 	static IP_Hdr* ip4_hdr = 0;
 
-	DBG_LOG(DBG_ANALYZER, "PIA_TCP[%d] FirstPacket(%s)", GetID(), (is_orig ? "T" : "F"));
+	DBG_LOG(DBG_ANALYZER, "PIA_TCP[{:d}] FirstPacket({:s})", GetID(), (is_orig ? "T" : "F"));
 
 	if ( ! ip )
 		{
@@ -427,7 +427,7 @@ void PIA_TCP::DeactivateAnalyzer(analyzer::Tag tag)
 
 void PIA_TCP::ReplayStreamBuffer(analyzer::Analyzer* analyzer)
 	{
-	DBG_LOG(DBG_ANALYZER, "PIA_TCP replaying %d total stream bytes", stream_buffer.size);
+	DBG_LOG(DBG_ANALYZER, "PIA_TCP replaying {:d} total stream bytes", stream_buffer.size);
 
 	for ( DataBlock* b = stream_buffer.head; b; b = b->next )
 		{

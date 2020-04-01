@@ -54,9 +54,8 @@ bool AnalyzerSet::Add(const file_analysis::Tag& tag, RecordVal* args)
 
 	if ( analyzer_map.Lookup(key) )
 		{
-		DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Instantiate analyzer %s skipped: already exists",
-		        file->GetID().c_str(),
-		        file_mgr->GetComponentName(tag).c_str());
+		DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Instantiate analyzer {:s} skipped: already exists",
+		        file->GetID(), file_mgr->GetComponentName(tag));
 
 		delete key;
 		return true;
@@ -95,9 +94,8 @@ bool AnalyzerSet::AddMod::Perform(AnalyzerSet* set)
 	{
 	if ( set->analyzer_map.Lookup(key) )
 		{
-		DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Add analyzer %s skipped: already exists",
-		        a->GetFile()->GetID().c_str(),
-		        file_mgr->GetComponentName(a->Tag()).c_str());
+		DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Add analyzer {:s} skipped: already exists",
+		        a->GetFile()->GetID(), file_mgr->GetComponentName(a->Tag()));
 
 		Abort();
 		return true;
@@ -128,14 +126,13 @@ bool AnalyzerSet::Remove(const file_analysis::Tag& tag, HashKey* key)
 
 	if ( ! a )
 		{
-		DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Skip remove analyzer %s",
-		        file->GetID().c_str(), file_mgr->GetComponentName(tag).c_str());
+		DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Skip remove analyzer {:s}",
+		        file->GetID(), file_mgr->GetComponentName(tag));
 		return false;
 		}
 
-	DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Remove analyzer %s",
-	        file->GetID().c_str(),
-	        file_mgr->GetComponentName(tag).c_str());
+	DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Remove analyzer {:s}",
+	        file->GetID(), file_mgr->GetComponentName(tag));
 
 	a->Done();
 
@@ -191,8 +188,8 @@ file_analysis::Analyzer* AnalyzerSet::InstantiateAnalyzer(const Tag& tag,
 
 void AnalyzerSet::Insert(file_analysis::Analyzer* a, HashKey* key)
 	{
-	DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Add analyzer %s",
-	        file->GetID().c_str(), file_mgr->GetComponentName(a->Tag()).c_str());
+	DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Add analyzer {:s}",
+	        file->GetID(), file_mgr->GetComponentName(a->Tag()));
 	analyzer_map.Insert(key, a);
 	delete key;
 
@@ -204,8 +201,8 @@ void AnalyzerSet::DrainModifications()
 	if ( mod_queue.empty() )
 		return;
 
-	DBG_LOG(DBG_FILE_ANALYSIS, "[%s] Start analyzer mod queue flush",
-	        file->GetID().c_str());
+	DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] Start analyzer mod queue flush",
+	        file->GetID());
 	do
 		{
 		Modification* mod = mod_queue.front();
@@ -213,6 +210,6 @@ void AnalyzerSet::DrainModifications()
 		delete mod;
 		mod_queue.pop();
 		} while ( ! mod_queue.empty() );
-	DBG_LOG(DBG_FILE_ANALYSIS, "[%s] End flushing analyzer mod queue.",
-	        file->GetID().c_str());
+	DBG_LOG(DBG_FILE_ANALYSIS, "[{:s}] End flushing analyzer mod queue.",
+	        file->GetID());
 	}

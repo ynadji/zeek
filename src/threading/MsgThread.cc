@@ -341,7 +341,7 @@ void MsgThread::SendIn(BasicInputMessage* msg, bool force)
 		return;
 		}
 
-	DBG_LOG(DBG_THREADING, "Sending '%s' to %s ...", msg->Name(), Name());
+	DBG_LOG(DBG_THREADING, "Sending '{:s}' to {:s} ...", msg->Name(), Name());
 
 	queue_in.Put(msg);
 	++cnt_sent_in;
@@ -369,7 +369,7 @@ BasicOutputMessage* MsgThread::RetrieveOut()
 	if ( ! msg )
 		return 0;
 
-	DBG_LOG(DBG_THREADING, "Retrieved '%s' from %s",  msg->Name(), Name());
+	DBG_LOG(DBG_THREADING, "Retrieved '{:s}' from {:s}",  msg->Name(), Name());
 
 	return msg;
 	}

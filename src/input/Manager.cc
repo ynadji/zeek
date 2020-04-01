@@ -278,8 +278,7 @@ bool Manager::CreateStream(Stream* info, RecordVal* description)
 	info->description = description;
 
 
-	DBG_LOG(DBG_INPUT, "Successfully created new input stream %s",
-		name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully created new input stream {:s}", name);
 
 	return true;
 	}
@@ -431,8 +430,7 @@ bool Manager::CreateEventStream(RecordVal* fval)
 
 	readers[stream->reader] = stream;
 
-	DBG_LOG(DBG_INPUT, "Successfully created event stream %s",
-		stream->name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully created event stream {:s}", stream->name);
 
 	return true;
 }
@@ -667,8 +665,7 @@ bool Manager::CreateTableStream(RecordVal* fval)
 
 	readers[stream->reader] = stream;
 
-	DBG_LOG(DBG_INPUT, "Successfully created table stream %s",
-		stream->name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully created table stream {:s}", stream->name);
 
 	return true;
 	}
@@ -750,8 +747,7 @@ bool Manager::CreateAnalysisStream(RecordVal* fval)
 
 	readers[stream->reader] = stream;
 
-	DBG_LOG(DBG_INPUT, "Successfully created analysis stream %s",
-		stream->name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully created analysis stream {:s}", stream->name);
 
 	return true;
 	}
@@ -820,8 +816,7 @@ bool Manager::RemoveStream(Stream *i)
 
 	i->removed = true;
 
-	DBG_LOG(DBG_INPUT, "Successfully queued removal of stream %s",
-		i->name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully queued removal of stream {:s}", i->name);
 
 	i->reader->Stop();
 
@@ -851,8 +846,7 @@ bool Manager::RemoveStreamContinuation(ReaderFrontend* reader)
 		}
 
 #ifdef DEBUG
-		DBG_LOG(DBG_INPUT, "Successfully executed removal of stream %s",
-		i->name.c_str());
+	DBG_LOG(DBG_INPUT, "Successfully executed removal of stream {:s}", i->name);
 #endif
 
 	readers.erase(reader);
@@ -964,7 +958,7 @@ bool Manager::ForceUpdate(const string &name)
 	i->reader->Update();
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "Forcing update of stream %s", name.c_str());
+	DBG_LOG(DBG_INPUT, "Forcing update of stream {:s}", name);
 #endif
 
 	return true; // update is async :(
@@ -1285,13 +1279,13 @@ void Manager::EndCurrentSend(ReaderFrontend* reader)
 		}
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "Got EndCurrentSend stream %s", i->name.c_str());
+	DBG_LOG(DBG_INPUT, "Got EndCurrentSend stream {:s}", i->name);
 #endif
 
 	if ( i->stream_type != TABLE_STREAM )
 		{
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "%s is event, sending end of data", i->name.c_str());
+		DBG_LOG(DBG_INPUT, "{:s} is event, sending end of data", i->name);
 #endif
 		// just signal the end of the data source
 		SendEndOfData(i);
@@ -1373,8 +1367,7 @@ void Manager::EndCurrentSend(ReaderFrontend* reader)
 	stream->currDict->SetDeleteFunc(input_hash_delete_func);
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "EndCurrentSend complete for stream %s",
-		i->name.c_str());
+	DBG_LOG(DBG_INPUT, "EndCurrentSend complete for stream {:s}", i->name);
 #endif
 
 	SendEndOfData(i);
@@ -1398,8 +1391,7 @@ void Manager::SendEndOfData(ReaderFrontend* reader)
 void Manager::SendEndOfData(const Stream *i)
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "SendEndOfData for stream %s",
-		i->name.c_str());
+	DBG_LOG(DBG_INPUT, "SendEndOfData for stream {:s}", i->name);
 #endif
 	SendEvent(end_of_data, 2, new StringVal(i->name.c_str()),
 	          new StringVal(i->reader->Info().source));
@@ -1418,8 +1410,7 @@ void Manager::Put(ReaderFrontend* reader, Value* *vals)
 		}
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "Put for stream %s",
-		i->name.c_str());
+	DBG_LOG(DBG_INPUT, "Put for stream {:s}", i->name);
 #endif
 
 	int readFields = 0;
@@ -1648,8 +1639,7 @@ void Manager::Clear(ReaderFrontend* reader)
 		}
 
 #ifdef DEBUG
-		DBG_LOG(DBG_INPUT, "Got Clear for stream %s",
-			i->name.c_str());
+	DBG_LOG(DBG_INPUT, "Got Clear for stream {:s}", i->name);
 #endif
 
 	assert(i->stream_type == TABLE_STREAM);
@@ -1776,8 +1766,7 @@ bool Manager::SendEvent(ReaderFrontend* reader, const string& name, const int nu
 		}
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "SendEvent for event %s with %d vals",
-		name.c_str(), num_vals);
+	DBG_LOG(DBG_INPUT, "SendEvent for event {:s} with {:d} vals", name, num_vals);
 #endif
 
 	RecordType *type = handler->FType()->Args();
@@ -1822,8 +1811,7 @@ void Manager::SendEvent(EventHandlerPtr ev, list<Val*> events) const
 	vl.reserve(events.size());
 
 #ifdef DEBUG
-	DBG_LOG(DBG_INPUT, "SendEvent with %" PRIuPTR " vals (list)",
-		events.size());
+	DBG_LOG(DBG_INPUT, "SendEvent with {:d} vals (list)", events.size());
 #endif
 
 	for ( list<Val*>::iterator i = events.begin(); i != events.end(); i++ )

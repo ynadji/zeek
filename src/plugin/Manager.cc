@@ -63,7 +63,7 @@ void Manager::SearchDynamicPlugins(const std::string& dir)
 
 	if ( ! is_dir(dir) )
 		{
-		DBG_LOG(DBG_PLUGINS, "Not a valid plugin directory: %s", dir.c_str());
+		DBG_LOG(DBG_PLUGINS, "Not a valid plugin directory: {:s}", dir);
 		return;
 		}
 
@@ -89,14 +89,14 @@ void Manager::SearchDynamicPlugins(const std::string& dir)
 
 		if ( dynamic_plugins.find(lower_name) != dynamic_plugins.end() )
 			{
-			DBG_LOG(DBG_PLUGINS, "Found already known plugin %s in %s, ignoring", name.c_str(), dir.c_str());
+			DBG_LOG(DBG_PLUGINS, "Found already known plugin {:s} in {:s}, ignoring", name, dir);
 			return;
 			}
 
 		// Record it, so that we can later activate it.
 		dynamic_plugins.insert(std::make_pair(lower_name, dir));
 
-		DBG_LOG(DBG_PLUGINS, "Found plugin %s in %s", name.c_str(), dir.c_str());
+		DBG_LOG(DBG_PLUGINS, "Found plugin {:s} in {:s}", name, dir);
 		return;
 		}
 
@@ -106,7 +106,7 @@ void Manager::SearchDynamicPlugins(const std::string& dir)
 
 	if ( ! d )
 		{
-		DBG_LOG(DBG_PLUGINS, "Cannot open directory %s", dir.c_str());
+		DBG_LOG(DBG_PLUGINS, "Cannot open directory {:s}", dir);
 		return;
 		}
 
@@ -126,7 +126,7 @@ void Manager::SearchDynamicPlugins(const std::string& dir)
 
 		if( stat(path.c_str(), &st) < 0 )
 			{
-			DBG_LOG(DBG_PLUGINS, "Cannot stat %s: %s", path.c_str(), strerror(errno));
+			DBG_LOG(DBG_PLUGINS, "Cannot stat {:s}: {:s}", path, strerror(errno));
 			continue;
 			}
 
@@ -170,14 +170,14 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 	std::string dir = m->second + "/";
 
-	DBG_LOG(DBG_PLUGINS, "Activating plugin %s", name.c_str());
+	DBG_LOG(DBG_PLUGINS, "Activating plugin {:s}", name);
 
 	// Add the "scripts" and "bif" directories to ZEEKPATH.
 	std::string scripts = dir + "scripts";
 
 	if ( is_dir(scripts) )
 		{
-		DBG_LOG(DBG_PLUGINS, "  Adding %s to ZEEKPATH", scripts.c_str());
+		DBG_LOG(DBG_PLUGINS, "  Adding {:s} to ZEEKPATH", scripts);
 		add_to_bro_path(scripts);
 		}
 
@@ -190,7 +190,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 		if ( is_file(init) )
 			{
-			DBG_LOG(DBG_PLUGINS, "  Loading %s", init.c_str());
+			DBG_LOG(DBG_PLUGINS, "  Loading {:s}", init);
 			warn_if_legacy_script(init);
 			scripts_to_load.push_back(init);
 			break;
@@ -204,7 +204,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 		if ( is_file(init) )
 			{
-			DBG_LOG(DBG_PLUGINS, "  Loading %s", init.c_str());
+			DBG_LOG(DBG_PLUGINS, "  Loading {:s}", init);
 			warn_if_legacy_script(init);
 			scripts_to_load.push_back(init);
 			break;
@@ -217,7 +217,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 		if ( is_file(init) )
 			{
-			DBG_LOG(DBG_PLUGINS, "  Loading %s", init.c_str());
+			DBG_LOG(DBG_PLUGINS, "  Loading {:s}", init);
 			warn_if_legacy_script(init);
 			scripts_to_load.push_back(init);
 			break;
@@ -228,7 +228,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 	string dypattern = dir + "/lib/*." + HOST_ARCHITECTURE + DYNAMIC_PLUGIN_SUFFIX;
 
-	DBG_LOG(DBG_PLUGINS, "  Searching for shared libraries %s", dypattern.c_str());
+	DBG_LOG(DBG_PLUGINS, "  Searching for shared libraries {:s}", dypattern);
 
 	glob_t gl;
 
@@ -274,7 +274,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 			current_sopath = 0;
 			current_plugin = 0;
 
-			DBG_LOG(DBG_PLUGINS, "  Loaded %s", path);
+			DBG_LOG(DBG_PLUGINS, "  Loaded {:s}", path);
 			}
 
 		globfree(&gl);
@@ -577,8 +577,8 @@ void Manager::DisableHook(HookType hook, Plugin* plugin)
 
 void Manager::RequestEvent(EventHandlerPtr handler, Plugin* plugin)
 	{
-	DBG_LOG(DBG_PLUGINS, "Plugin %s requested event %s",
-	        plugin->Name().c_str(), handler->Name());
+	DBG_LOG(DBG_PLUGINS, "Plugin {:s} requested event {:s}",
+	        plugin->Name(), handler->Name());
 	handler->SetGenerateAlways();
 	}
 

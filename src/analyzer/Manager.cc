@@ -110,7 +110,7 @@ void Manager::DumpDebug()
 	DBG_LOG(DBG_ANALYZER, "Available analyzers after zeek_init():");
 	list<Component*> all_analyzers = GetComponents();
 	for ( list<Component*>::const_iterator i = all_analyzers.begin(); i != all_analyzers.end(); ++i )
-		DBG_LOG(DBG_ANALYZER, "    %s (%s)", (*i)->Name().c_str(),
+		DBG_LOG(DBG_ANALYZER, "    {:s} ({:s})", (*i)->Name(),
 			IsEnabled((*i)->Tag()) ? "enabled" : "disabled");
 
 	DBG_LOG(DBG_ANALYZER, " ");
@@ -123,7 +123,7 @@ void Manager::DumpDebug()
 		for ( tag_set::const_iterator j = i->second->begin(); j != i->second->end(); j++ )
 			s += string(GetComponentName(*j)) + " ";
 
-		DBG_LOG(DBG_ANALYZER, "    %d/tcp: %s", i->first, s.c_str());
+		DBG_LOG(DBG_ANALYZER, "    {:d}/tcp: {:s}", i->first, s.c_str());
 		}
 
 	for ( analyzer_map_by_port::const_iterator i = analyzers_by_port_udp.begin(); i != analyzers_by_port_udp.end(); i++ )
@@ -133,7 +133,7 @@ void Manager::DumpDebug()
 		for ( tag_set::const_iterator j = i->second->begin(); j != i->second->end(); j++ )
 			s += string(GetComponentName(*j)) + " ";
 
-		DBG_LOG(DBG_ANALYZER, "    %d/udp: %s", i->first, s.c_str());
+		DBG_LOG(DBG_ANALYZER, "    {:d}/udp: {:s}", i->first, s.c_str());
 		}
 
 #endif
@@ -150,7 +150,7 @@ bool Manager::EnableAnalyzer(const Tag& tag)
 	if ( ! p  )
 		return false;
 
-	DBG_LOG(DBG_ANALYZER, "Enabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_ANALYZER, "Enabling analyzer {:s}", p->Name());
 	p->SetEnabled(true);
 
 	return true;
@@ -163,7 +163,7 @@ bool Manager::EnableAnalyzer(EnumVal* val)
 	if ( ! p  )
 		return false;
 
-	DBG_LOG(DBG_ANALYZER, "Enabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_ANALYZER, "Enabling analyzer {:s}", p->Name());
 	p->SetEnabled(true);
 
 	return true;
@@ -176,7 +176,7 @@ bool Manager::DisableAnalyzer(const Tag& tag)
 	if ( ! p  )
 		return false;
 
-	DBG_LOG(DBG_ANALYZER, "Disabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_ANALYZER, "Disabling analyzer {:s}", p->Name());
 	p->SetEnabled(false);
 
 	return true;
@@ -189,7 +189,7 @@ bool Manager::DisableAnalyzer(EnumVal* val)
 	if ( ! p  )
 		return false;
 
-	DBG_LOG(DBG_ANALYZER, "Disabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_ANALYZER, "Disabling analyzer {:s}", p->Name());
 	p->SetEnabled(false);
 
 	return true;
@@ -262,7 +262,7 @@ bool Manager::RegisterAnalyzerForPort(const Tag& tag, TransportProto proto, uint
 
 #ifdef DEBUG
 	const char* name = GetComponentName(tag).c_str();
-	DBG_LOG(DBG_ANALYZER, "Registering analyzer %s for port %" PRIu32 "/%d", name, port, proto);
+	DBG_LOG(DBG_ANALYZER, "Registering analyzer {:s} for port {:d}/{:d}", name, port, proto);
 #endif
 
 	l->insert(tag);
@@ -278,7 +278,7 @@ bool Manager::UnregisterAnalyzerForPort(const Tag& tag, TransportProto proto, ui
 
 #ifdef DEBUG
 	const char* name = GetComponentName(tag).c_str();
-	DBG_LOG(DBG_ANALYZER, "Unregistering analyzer %s for port %" PRIu32 "/%d", name, port, proto);
+	DBG_LOG(DBG_ANALYZER, "Unregistering analyzer {:s} for port {:d}/{:d}", name, port, proto);
 #endif
 
 	l->erase(tag);
@@ -418,8 +418,8 @@ bool Manager::BuildInitialAnalyzerTree(Connection* conn)
 						continue;
 
 					root->AddChildAnalyzer(analyzer, false);
-					DBG_ANALYZER_ARGS(conn, "activated %s analyzer due to port %d",
-							  analyzer_mgr->GetComponentName(*j).c_str(), resp_port);
+					DBG_ANALYZER_ARGS(conn, "activated {:s} analyzer due to port {:d}",
+							  analyzer_mgr->GetComponentName(*j), resp_port);
 					}
 				}
 			}
@@ -524,8 +524,8 @@ void Manager::ExpireScheduledAnalyzers()
 
 			conns.erase(i);
 
-			DBG_LOG(DBG_ANALYZER, "Expiring expected analyzer %s for connection %s",
-				analyzer_mgr->GetComponentName(a->analyzer).c_str(),
+			DBG_LOG(DBG_ANALYZER, "Expiring expected analyzer {:s} for connection {:s}",
+				analyzer_mgr->GetComponentName(a->analyzer),
 				fmt_conn_id(a->conn.orig, 0, a->conn.resp, a->conn.resp_p));
 
 			delete a;
@@ -630,8 +630,8 @@ bool Manager::ApplyScheduledAnalyzers(Connection* conn, bool init, TransportLaye
 		Ref(tag);
 		conn->Event(scheduled_analyzer_applied, 0, tag);
 
-		DBG_ANALYZER_ARGS(conn, "activated %s analyzer as scheduled",
-		                  analyzer_mgr->GetComponentName(*it).c_str());
+		DBG_ANALYZER_ARGS(conn, "activated {:s} analyzer as scheduled",
+		                  analyzer_mgr->GetComponentName(*it));
 		}
 
 	return expected.size();

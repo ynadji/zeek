@@ -138,7 +138,7 @@ Trigger::Trigger(Expr* arg_cond, Stmt* arg_body, Stmt* arg_timeout_stmts,
 	location = arg_location;
 	timeout_value = -1;
 
-	DBG_LOG(DBG_NOTIFIERS, "%s: instantiating", Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: instantiating", Name());
 
 	if ( is_return )
 		{
@@ -207,7 +207,7 @@ void Trigger::Terminate()
 
 Trigger::~Trigger()
 	{
-	DBG_LOG(DBG_NOTIFIERS, "%s: deleting", Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: deleting", Name());
 
 	for ( ValCache::iterator i = cache.begin(); i != cache.end(); ++i )
 		Unref(i->second);
@@ -233,11 +233,11 @@ bool Trigger::Eval()
 	if ( disabled )
 		return true;
 
-	DBG_LOG(DBG_NOTIFIERS, "%s: evaluating", Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: evaluating", Name());
 
 	if ( delayed )
 		{
-		DBG_LOG(DBG_NOTIFIERS, "%s: skipping eval due to delayed call",
+		DBG_LOG(DBG_NOTIFIERS, "{:s}: skipping eval due to delayed call",
 				Name());
 		return false;
 		}
@@ -280,7 +280,7 @@ bool Trigger::Eval()
 
 	if ( f->HasDelayed() )
 		{
-		DBG_LOG(DBG_NOTIFIERS, "%s: eval has delayed", Name());
+		DBG_LOG(DBG_NOTIFIERS, "{:s}: eval has delayed", Name());
 		assert(!v);
 		Unref(f);
 		return false;
@@ -289,14 +289,13 @@ bool Trigger::Eval()
 	if ( ! v || v->IsZero() )
 		{
 		// Not true. Perhaps next time...
-		DBG_LOG(DBG_NOTIFIERS, "%s: trigger condition is false", Name());
+		DBG_LOG(DBG_NOTIFIERS, "{:s}: trigger condition is false", Name());
 		Unref(f);
 		Init();
 		return false;
 		}
 
-	DBG_LOG(DBG_NOTIFIERS, "%s: trigger condition is true, executing",
-			Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: trigger condition is true, executing", Name());
 
 	v = nullptr;
 	stmt_flow_type flow;
@@ -317,7 +316,7 @@ bool Trigger::Eval()
 
 #ifdef DEBUG
 		const char* pname = copy_string(trigger->Name());
-		DBG_LOG(DBG_NOTIFIERS, "%s: trigger has parent %s, caching result", Name(), pname);
+		DBG_LOG(DBG_NOTIFIERS, "{:s}: trigger has parent {:s}, caching result", Name(), pname);
 		delete [] pname;
 #endif
 
@@ -347,7 +346,7 @@ void Trigger::Timeout()
 	if ( disabled )
 		return;
 
-	DBG_LOG(DBG_NOTIFIERS, "%s: timeout", Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: timeout", Name());
 	if ( timeout_stmts )
 		{
 		stmt_flow_type flow;
@@ -370,7 +369,7 @@ void Trigger::Timeout()
 
 #ifdef DEBUG
 			const char* pname = copy_string(trigger->Name());
-			DBG_LOG(DBG_NOTIFIERS, "%s: trigger has parent %s, caching timeout result", Name(), pname);
+			DBG_LOG(DBG_NOTIFIERS, "{:s}: trigger has parent {:s}, caching timeout result", Name(), pname);
 			delete [] pname;
 #endif
 			auto queued = trigger->Cache(frame->GetCall(), v.get());
@@ -411,7 +410,7 @@ void Trigger::Register(Val* val)
 
 void Trigger::UnregisterAll()
 	{
-	DBG_LOG(DBG_NOTIFIERS, "%s: unregistering all", Name());
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: unregistering all", Name());
 
 	for ( const auto& o : objs )
 		{
@@ -430,7 +429,7 @@ void Trigger::Attach(Trigger *trigger)
 
 #ifdef DEBUG
 	const char* pname = copy_string(trigger->Name());
-	DBG_LOG(DBG_NOTIFIERS, "%s: attaching to %s", Name(), pname);
+	DBG_LOG(DBG_NOTIFIERS, "{:s}: attaching to {:s}", Name(), pname);
 	delete [] pname;
 #endif
 

@@ -297,8 +297,8 @@ uint16_t Manager::Listen(const string& addr, uint16_t port)
 	// Register as a "does-count" source now.
 	iosource_mgr->Register(this, false);
 
-	DBG_LOG(DBG_BROKER, "Listening on %s:%" PRIu16,
-		addr.empty() ? "INADDR_ANY" : addr.c_str(), port);
+	DBG_LOG(DBG_BROKER, "Listening on {:s}:{:d}",
+		addr.empty() ? "INADDR_ANY" : addr, port);
 
 	return bound_port;
 	}
@@ -308,8 +308,7 @@ void Manager::Peer(const string& addr, uint16_t port, double retry)
 	if ( bstate->endpoint.is_shutdown() )
 		return;
 
-	DBG_LOG(DBG_BROKER, "Starting to peer with %s:%" PRIu16,
-		addr.c_str(), port);
+	DBG_LOG(DBG_BROKER, "Starting to peer with {:s}:{:d}", addr, port);
 
 	auto e = zeekenv("ZEEK_DEFAULT_CONNECT_RETRY");
 
@@ -335,8 +334,7 @@ void Manager::Unpeer(const string& addr, uint16_t port)
 	if ( bstate->endpoint.is_shutdown() )
 		return;
 
-	DBG_LOG(DBG_BROKER, "Stopping to peer with %s:%" PRIu16,
-		addr.c_str(), port);
+	DBG_LOG(DBG_BROKER, "Stopping to peer with {:s}:{:d}", addr, port);
 
 	FlushLogBuffers();
 	bstate->endpoint.unpeer_nosync(addr, port);
@@ -363,8 +361,8 @@ bool Manager::PublishEvent(string topic, std::string name, broker::vector args)
 	if ( peer_count == 0 )
 		return true;
 
-	DBG_LOG(DBG_BROKER, "Publishing event: %s",
-		RenderEvent(topic, name, args).c_str());
+	DBG_LOG(DBG_BROKER, "Publishing event: {:s}",
+		RenderEvent(topic, name, args));
 	broker::zeek::Event ev(std::move(name), std::move(args));
 	bstate->endpoint.publish(move(topic), ev.move_data());
 	++statistics.num_events_outgoing;
@@ -427,8 +425,8 @@ bool Manager::PublishIdentifier(std::string topic, std::string id)
 		}
 
 	broker::zeek::IdentifierUpdate msg(move(id), move(*data));
-	DBG_LOG(DBG_BROKER, "Publishing id-update: %s",
-	        RenderMessage(topic, msg.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Publishing id-update: {:s}",
+	        RenderMessage(topic, msg.as_data()));
 	bstate->endpoint.publish(move(topic), msg.move_data());
 	++statistics.num_ids_outgoing;
 	return true;
@@ -479,7 +477,7 @@ bool Manager::PublishLogCreate(EnumVal* stream, EnumVal* writer,
 	auto bwriter_id = broker::enum_value(move(writer_id));
 	broker::zeek::LogCreate msg(move(bstream_id), move(bwriter_id), move(writer_info), move(fields_data));
 
-	DBG_LOG(DBG_BROKER, "Publishing log creation: %s", RenderMessage(topic, msg.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Publishing log creation: {:s}", RenderMessage(topic, msg.as_data()));
 
 	if ( peer.node != NoPeer.node )
 		// Direct message.
@@ -562,7 +560,7 @@ bool Manager::PublishLogWrite(EnumVal* stream, EnumVal* writer, string path, int
 	broker::zeek::LogWrite msg(move(bstream_id), move(bwriter_id), move(path),
 	                          move(serial_data));
 
-	DBG_LOG(DBG_BROKER, "Buffering log record: %s", RenderMessage(topic, msg.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Buffering log record: {:s}", RenderMessage(topic, msg.as_data()));
 
 	if ( log_buffers.size() <= (unsigned int)stream_id_num )
 		log_buffers.resize(stream_id_num + 1);
@@ -638,7 +636,7 @@ bool Manager::AutoPublishEvent(string topic, Val* event)
 		return false;
 		}
 
-	DBG_LOG(DBG_BROKER, "Enabling auto-publising of event %s to topic %s", handler->Name(), topic.c_str());
+	DBG_LOG(DBG_BROKER, "Enabling auto-publising of event {:s} to topic {:s}", handler->Name(), topic);
 	handler->AutoPublish(move(topic));
 
 	return true;
@@ -670,7 +668,7 @@ bool Manager::AutoUnpublishEvent(const string& topic, Val* event)
 		}
 
 
-	DBG_LOG(DBG_BROKER, "Disabling auto-publishing of event %s to topic %s", handler->Name(), topic.c_str());
+	DBG_LOG(DBG_BROKER, "Disabling auto-publishing of event {:s} to topic {:s}", handler->Name(), topic);
 	handler->AutoUnpublish(topic);
 
 	return true;
@@ -758,7 +756,7 @@ RecordVal* Manager::MakeEvent(val_list* args, Frame* frame)
 
 bool Manager::Subscribe(const string& topic_prefix)
 	{
-	DBG_LOG(DBG_BROKER, "Subscribing to topic prefix %s", topic_prefix.c_str());
+	DBG_LOG(DBG_BROKER, "Subscribing to topic prefix {:s}", topic_prefix);
 	bstate->subscriber.add_topic(topic_prefix, ! after_zeek_init);
 
 	// For backward compatibility, we also may receive messages on
@@ -778,7 +776,7 @@ bool Manager::Forward(string topic_prefix)
 		if ( forwarded_prefixes[i] == topic_prefix )
 			return false;
 
-	DBG_LOG(DBG_BROKER, "Forwarding topic prefix %s", topic_prefix.c_str());
+	DBG_LOG(DBG_BROKER, "Forwarding topic prefix {:s}", topic_prefix);
 	Subscribe(topic_prefix);
 	forwarded_prefixes.emplace_back(std::move(topic_prefix));
 	return true;
@@ -789,12 +787,12 @@ bool Manager::Unsubscribe(const string& topic_prefix)
 	for ( auto i = 0u; i < forwarded_prefixes.size(); ++i )
 		if ( forwarded_prefixes[i] == topic_prefix )
 			{
-			DBG_LOG(DBG_BROKER, "Unforwading topic prefix %s", topic_prefix.c_str());
+			DBG_LOG(DBG_BROKER, "Unforwading topic prefix {:s}", topic_prefix);
 			forwarded_prefixes.erase(forwarded_prefixes.begin() + i);
 			break;
 			}
 
-	DBG_LOG(DBG_BROKER, "Unsubscribing from topic prefix %s", topic_prefix.c_str());
+	DBG_LOG(DBG_BROKER, "Unsubscribing from topic prefix {:s}", topic_prefix);
 	bstate->subscriber.remove_topic(topic_prefix, ! after_zeek_init);
 	return true;
 	}
@@ -935,8 +933,7 @@ void Manager::ProcessEvent(const broker::topic& topic, broker::zeek::Event ev)
 	auto name = std::move(ev.name());
 	auto args = std::move(ev.args());
 
-	DBG_LOG(DBG_BROKER, "Process event: %s %s",
-			name.data(), RenderMessage(args).data());
+	DBG_LOG(DBG_BROKER, "Process event: {:s} {:s}", name, RenderMessage(args));
 	++statistics.num_events_incoming;
 	auto handler = event_registry->Lookup(name);
 
@@ -955,8 +952,8 @@ void Manager::ProcessEvent(const broker::topic& topic, broker::zeek::Event ev)
 		if ( strncmp(p.data(), topic_string.data(), p.size()) != 0 )
 			continue;
 
-		DBG_LOG(DBG_BROKER, "Skip processing of forwarded event: %s %s",
-		        name.data(), RenderMessage(args).data());
+		DBG_LOG(DBG_BROKER, "Skip processing of forwarded event: {:s} {:s}",
+		        name, RenderMessage(args));
 		return;
 		}
 
@@ -1005,7 +1002,7 @@ void Manager::ProcessEvent(const broker::topic& topic, broker::zeek::Event ev)
 
 bool bro_broker::Manager::ProcessLogCreate(broker::zeek::LogCreate lc)
 	{
-	DBG_LOG(DBG_BROKER, "Received log-create: %s", RenderMessage(lc.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Received log-create: {:s}", RenderMessage(lc.as_data()));
 	if ( ! lc.valid() )
 		{
 		reporter->Warning("received invalid broker LogCreate: {:s}",
@@ -1071,7 +1068,7 @@ bool bro_broker::Manager::ProcessLogCreate(broker::zeek::LogCreate lc)
 
 bool bro_broker::Manager::ProcessLogWrite(broker::zeek::LogWrite lw)
 	{
-	DBG_LOG(DBG_BROKER, "Received log-write: %s", RenderMessage(lw.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Received log-write: {:s}", RenderMessage(lw.as_data()));
 
 	if ( ! lw.valid() )
 		{
@@ -1153,7 +1150,7 @@ bool bro_broker::Manager::ProcessLogWrite(broker::zeek::LogWrite lw)
 
 bool Manager::ProcessIdentifierUpdate(broker::zeek::IdentifierUpdate iu)
 	{
-	DBG_LOG(DBG_BROKER, "Received id-update: %s", RenderMessage(iu.as_data()).c_str());
+	DBG_LOG(DBG_BROKER, "Received id-update: {:s}", RenderMessage(iu.as_data()));
 
 	if ( ! iu.valid() )
 		{
@@ -1187,7 +1184,7 @@ bool Manager::ProcessIdentifierUpdate(broker::zeek::IdentifierUpdate iu)
 
 void Manager::ProcessStatus(broker::status stat)
 	{
-	DBG_LOG(DBG_BROKER, "Received status message: %s", RenderMessage(stat).c_str());
+	DBG_LOG(DBG_BROKER, "Received status message: {:s}", RenderMessage(stat));
 
 	auto ctx = stat.context<broker::endpoint_info>();
 
@@ -1251,7 +1248,7 @@ void Manager::ProcessStatus(broker::status stat)
 
 void Manager::ProcessError(broker::error err)
 	{
-	DBG_LOG(DBG_BROKER, "Received error message: %s", RenderMessage(err).c_str());
+	DBG_LOG(DBG_BROKER, "Received error message: {:s}", RenderMessage(err).c_str());
 
 	if ( ! Broker::error )
 		return;
@@ -1331,7 +1328,7 @@ void Manager::ProcessError(broker::error err)
 
 void Manager::ProcessStoreResponse(StoreHandleVal* s, broker::store::response response)
 	{
-	DBG_LOG(DBG_BROKER, "Received store response: %s", RenderMessage(response).c_str());
+	DBG_LOG(DBG_BROKER, "Received store response: {:s}", RenderMessage(response));
 
 	auto request = pending_queries.find(std::make_pair(response.id, s));
 
@@ -1383,7 +1380,7 @@ StoreHandleVal* Manager::MakeMaster(const string& name, broker::backend type,
 	if ( LookupStore(name) )
 		return nullptr;
 
-	DBG_LOG(DBG_BROKER, "Creating master for data store %s", name.c_str());
+	DBG_LOG(DBG_BROKER, "Creating master for data store {:s}", name);
 
 	auto it = opts.find("path");
 
@@ -1441,7 +1438,7 @@ StoreHandleVal* Manager::MakeClone(const string& name, double resync_interval,
 	if ( LookupStore(name) )
 		return nullptr;
 
-	DBG_LOG(DBG_BROKER, "Creating clone for data store %s", name.c_str());
+	DBG_LOG(DBG_BROKER, "Creating clone for data store {:s}", name);
 
 	auto result = bstate->endpoint.attach_clone(name, resync_interval,
 	                                            stale_interval,
@@ -1470,7 +1467,7 @@ StoreHandleVal* Manager::LookupStore(const string& name)
 
 bool Manager::CloseStore(const string& name)
 	{
-	DBG_LOG(DBG_BROKER, "Closing data store %s", name.c_str());
+	DBG_LOG(DBG_BROKER, "Closing data store {:s}", name);
 
 	auto s = data_stores.find(name);
 	if ( s == data_stores.end() )

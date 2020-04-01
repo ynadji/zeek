@@ -40,7 +40,7 @@ void Manager::WakeupHandler::Process()
 
 void Manager::WakeupHandler::Ping(const std::string& where)
 	{
-	DBG_LOG(DBG_MAINLOOP, "Pinging WakeupHandler from %s", where.c_str());
+	DBG_LOG(DBG_MAINLOOP, "Pinging WakeupHandler from {:s}", where);
 	flare.Fire();
 	}
 
@@ -156,7 +156,7 @@ void Manager::FindReadySources(std::vector<IOSource*>* ready)
 			}
 		}
 
-	DBG_LOG(DBG_MAINLOOP, "timeout: %f   ready size: %zu   time_to_poll: %d\n",
+	DBG_LOG(DBG_MAINLOOP, "timeout: {:f}   ready size: {:d}   time_to_poll: {:d}\n",
 		timeout, ready->size(), time_to_poll);
 
 	// If we didn't find any IOSources with zero timeouts or it's time to
@@ -225,7 +225,7 @@ bool Manager::RegisterFd(int fd, IOSource* src)
 	if ( ret != -1 )
 		{
 		events.push_back({});
-		DBG_LOG(DBG_MAINLOOP, "Registered fd %d from %s", fd, src->Tag());
+		DBG_LOG(DBG_MAINLOOP, "Registered fd {:d} from {:s}", fd, src->Tag());
 		fd_map[fd] = src;
 
 		Wakeup("RegisterFd");
@@ -246,7 +246,7 @@ bool Manager::UnregisterFd(int fd, IOSource* src)
 		EV_SET(&event, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
 		int ret = kevent(event_queue, &event, 1, NULL, 0, NULL);
 		if ( ret != -1 )
-			DBG_LOG(DBG_MAINLOOP, "Unregistered fd %d from %s", fd, src->Tag());
+			DBG_LOG(DBG_MAINLOOP, "Unregistered fd {:d} from {:s}", fd, src->Tag());
 
 		fd_map.erase(fd);
 
@@ -357,7 +357,7 @@ PktSrc* Manager::OpenPktSrc(const std::string& path, bool is_live)
 		// Set an error message if it didn't open successfully.
 		ps->Error("could not open");
 
-	DBG_LOG(DBG_PKTIO, "Created packet source of type %s for %s", component->Name().c_str(), npath.c_str());
+	DBG_LOG(DBG_PKTIO, "Created packet source of type {:s} for {:s}", component->Name(), npath);
 
 	Register(ps);
 	return ps;
@@ -396,7 +396,7 @@ PktDumper* Manager::OpenPktDumper(const string& path, bool append)
 		// Set an error message if it didn't open successfully.
 		pd->Error("could not open");
 
-	DBG_LOG(DBG_PKTIO, "Created packer dumper of type %s for %s", component->Name().c_str(), npath.c_str());
+	DBG_LOG(DBG_PKTIO, "Created packer dumper of type {:s} for {:s}", component->Name(), npath);
 
 	pd->Init();
 	pkt_dumpers.push_back(pd);

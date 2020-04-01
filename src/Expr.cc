@@ -4176,7 +4176,7 @@ IntrusivePtr<Val> CallExpr::Eval(Frame* f) const
 			if ( Val* v = trigger->Lookup(this) )
 				{
 				DBG_LOG(DBG_NOTIFIERS,
-					"%s: provides cached function result",
+					"{:s}: provides cached function result",
 					trigger->Name());
 				return {NewRef{}, v};
 				}

@@ -225,8 +225,7 @@ private:
 		vl.reserve(numvals);
 
 #ifdef DEBUG
-		DBG_LOG(DBG_INPUT, "SendEvent with %d vals",
-			numvals);
+		DBG_LOG(DBG_INPUT, "SendEvent with {:d} vals", numvals);
 #endif
 
 		std::array<Val*, sizeof...(args)> vals = {args...};

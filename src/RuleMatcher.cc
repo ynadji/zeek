@@ -630,7 +630,7 @@ RuleFileMagicState* RuleMatcher::InitFileMagic() const
 bool RuleMatcher::AllRulePatternsMatched(const Rule* r, MatchPos matchpos,
                                          const AcceptingMatchSet& ams)
 	{
-	DBG_LOG(DBG_RULES, "Checking rule: %s", r->id);
+	DBG_LOG(DBG_RULES, "Checking rule: {:s}", r->id);
 
 	// Check whether all patterns of the rule have matched.
 	for ( const auto& pattern : r->patterns )
@@ -668,7 +668,7 @@ RuleMatcher::MIME_Matches* RuleMatcher::Match(RuleFileMagicState* state,
 		{
 		const char* s = fmt_bytes(reinterpret_cast<const char*>(data),
 		                          min(40, static_cast<int>(len)));
-		DBG_LOG(DBG_RULES, "Matching %s rules on |%s%s|",
+		DBG_LOG(DBG_RULES, "Matching {:s} rules on |{:s}{:s}|",
 		        Rule::TypeToString(Rule::FILE_MAGIC), s,
 		        len > 40 ? "..." : "");
 		}
@@ -746,7 +746,7 @@ RuleEndpointState* RuleMatcher::InitEndpoint(analyzer::Analyzer* analyzer,
 		{
 		RuleHdrTest* hdr_test = tests[h];
 
-		DBG_LOG(DBG_RULES, "HdrTest %d matches (%s%s)", hdr_test->id,
+		DBG_LOG(DBG_RULES, "HdrTest {:d} matches ({:s}{:s})", hdr_test->id,
 				hdr_test->pattern_rules ? "+" : "-",
 				hdr_test->pure_rules ? "+" : "-");
 
@@ -866,7 +866,7 @@ void RuleMatcher::Match(RuleEndpointState* state, Rule::PatternType type,
 		const char* s =
 			fmt_bytes((const char *) data, min(40, data_len));
 
-		DBG_LOG(DBG_RULES, "Matching %s rules [%d,%d] on |%s%s|",
+		DBG_LOG(DBG_RULES, "Matching {:s} rules [{:d},{:d}] on |{:s}{:s}|",
 				Rule::TypeToString(type), bol, eol, s,
 				data_len > 40 ? "..." : "");
 		}
@@ -933,11 +933,11 @@ void RuleMatcher::Match(RuleEndpointState* state, Rule::PatternType type,
 		{
 		Rule* r = *it;
 
-		DBG_LOG(DBG_RULES, "Accepted rule: %s", r->id);
+		DBG_LOG(DBG_RULES, "Accepted rule: {:s}", r->id);
 
 		for ( const auto& h : state->hdr_tests )
 			{
-			DBG_LOG(DBG_RULES, "Checking for accepted rule on HdrTest %d", h->id);
+			DBG_LOG(DBG_RULES, "Checking for accepted rule on HdrTest {:d}", h->id);
 
 			// Skip if rule does not belong to this node.
 			if ( ! h->ruleset->Contains(r->Index()) )
@@ -999,7 +999,7 @@ bool RuleMatcher::ExecRulePurely(Rule* r, BroString* s,
 	if ( is_member_of(state->matched_rules, r->Index()) )
 		return false;
 
-	DBG_LOG(DBG_RULES, "Checking rule %s purely", r->ID());
+	DBG_LOG(DBG_RULES, "Checking rule {:s} purely", r->ID());
 
 	if ( EvalRuleConditions(r, state, 0, 0, eos) )
 		{
@@ -1019,7 +1019,7 @@ bool RuleMatcher::ExecRulePurely(Rule* r, BroString* s,
 bool RuleMatcher::EvalRuleConditions(Rule* r, RuleEndpointState* state,
 		const u_char* data, int len, bool eos)
 	{
-	DBG_LOG(DBG_RULES, "Evaluating conditions for rule %s", r->ID());
+	DBG_LOG(DBG_RULES, "Evaluating conditions for rule {:s}", r->ID());
 
 	// Check for other rules which have to match first.
 	for ( const auto& pc : r->preconds )
@@ -1056,7 +1056,7 @@ bool RuleMatcher::EvalRuleConditions(Rule* r, RuleEndpointState* state,
 		if ( ! cond->DoMatch(r, state, data, len) )
 			return false;
 
-	DBG_LOG(DBG_RULES, "Conditions met: MATCH! %s", r->ID());
+	DBG_LOG(DBG_RULES, "Conditions met: MATCH! {:s}", r->ID());
 	return true;
 	}
 

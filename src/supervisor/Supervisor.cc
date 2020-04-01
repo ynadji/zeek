@@ -188,7 +188,7 @@ void ParentProcessCheckTimer::Dispatch(double t, bool is_expire)
 Supervisor::Supervisor(Supervisor::Config cfg, StemState ss)
 	: config(std::move(cfg)), stem_pid(ss.pid), stem_pipe(std::move(ss.pipe))
 	{
-	DBG_LOG(DBG_SUPERVISOR, "forked stem process %d", stem_pid);
+	DBG_LOG(DBG_SUPERVISOR, "forked stem process {:d}", stem_pid);
 	setsignal(SIGCHLD, supervisor_signal_handler);
 
 	int status;
@@ -229,7 +229,7 @@ Supervisor::~Supervisor()
 	iosource_mgr->UnregisterFd(signal_flare.FD(), this);
 	iosource_mgr->UnregisterFd(stem_pipe->InFD(), this);
 
-	DBG_LOG(DBG_SUPERVISOR, "shutdown, killing stem process %d", stem_pid);
+	DBG_LOG(DBG_SUPERVISOR, "shutdown, killing stem process {:d}", stem_pid);
 
 	auto kill_res = kill(stem_pid, SIGTERM);
 
@@ -286,12 +286,12 @@ void Supervisor::ReapStem()
 
 	if ( WIFEXITED(status) )
 		{
-		DBG_LOG(DBG_SUPERVISOR, "stem process exited with status %d",
+		DBG_LOG(DBG_SUPERVISOR, "stem process exited with status {:d}",
 		        WEXITSTATUS(status));
 		}
 	else if ( WIFSIGNALED(status) )
 		{
-		DBG_LOG(DBG_SUPERVISOR, "stem process terminated by signal %d",
+		DBG_LOG(DBG_SUPERVISOR, "stem process terminated by signal {:d}",
 		       WTERMSIG(status));
 		}
 	else
@@ -303,7 +303,7 @@ void Supervisor::HandleChildSignal()
 	{
 	if ( last_signal >= 0 )
 		{
-		DBG_LOG(DBG_SUPERVISOR, "Supervisor received signal %d", last_signal);
+		DBG_LOG(DBG_SUPERVISOR, "Supervisor received signal {:d}", last_signal);
 		last_signal = -1;
 		}
 
@@ -313,7 +313,7 @@ void Supervisor::HandleChildSignal()
 		{
 		ReapStem();
 
-		DBG_LOG(DBG_SUPERVISOR, "Supervisor processed child signal %s",
+		DBG_LOG(DBG_SUPERVISOR, "Supervisor processed child signal {:s}",
 		        stem_pid ? "(spurious)" : "");
 		}
 
@@ -366,7 +366,7 @@ void Supervisor::HandleChildSignal()
 		exit(1);
 		}
 
-	DBG_LOG(DBG_SUPERVISOR, "stem process revived, new pid: %d", stem_pid);
+	DBG_LOG(DBG_SUPERVISOR, "stem process revived, new pid: {:d}", stem_pid);
 
 	// Parent supervisor process resends node configurations to recreate
 	// the desired process hierarchy.
@@ -417,7 +417,7 @@ size_t Supervisor::ProcessMessages()
 
 	for ( auto& msg : msgs )
 		{
-		DBG_LOG(DBG_SUPERVISOR, "read msg from Stem: %s", msg.data());
+		DBG_LOG(DBG_SUPERVISOR, "read msg from Stem: {:s}", msg);
 		std::vector<std::string> msg_tokens;
 		tokenize_string(msg, " ", &msg_tokens);
 		const auto& type = msg_tokens[0];
