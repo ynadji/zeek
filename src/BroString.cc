@@ -165,9 +165,9 @@ const char* BroString::CheckString() const
 		// Either an embedded NUL, or no final NUL.
 		char* exp_s = Render();
 		if ( nulTerm )
-			reporter->Error("string with embedded NUL: \"%s\"", exp_s);
+			reporter->Error("string with embedded NUL: \"{:s}\"", exp_s);
 		else
-			reporter->Error("string without NUL terminator: \"%s\"", exp_s);
+			reporter->Error("string without NUL terminator: \"{:s}\"", exp_s);
 
 		delete [] exp_s;
 		return "<string-with-NUL>";

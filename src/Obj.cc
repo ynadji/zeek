@@ -62,7 +62,7 @@ void BroObj::Warn(const char* msg, const BroObj* obj2, bool pinpoint_only, const
 	{
 	ODesc d;
 	DoMsg(&d, msg, obj2, pinpoint_only, expr_location);
-	reporter->Warning("%s", d.Description());
+	reporter->Warning("{:s}", d.Description());
 	reporter->PopLocation();
 	}
 
@@ -73,24 +73,24 @@ void BroObj::Error(const char* msg, const BroObj* obj2, bool pinpoint_only, cons
 
 	ODesc d;
 	DoMsg(&d, msg, obj2, pinpoint_only, expr_location);
-	reporter->Error("%s", d.Description());
+	reporter->Error("{:s}", d.Description());
 	reporter->PopLocation();
 	}
 
 void BroObj::BadTag(const char* msg, const char* t1, const char* t2) const
 	{
-	char out[512];
+	std::string out;
 
 	if ( t2 )
-		snprintf(out, sizeof(out), "%s (%s/%s)", msg, t1, t2);
+		out = fmtlib::format("{:s} ({:s}/{:s})", msg, t1, t2);
 	else if ( t1 )
-		snprintf(out, sizeof(out), "%s (%s)", msg, t1);
+		out = fmtlib::format("{:s} ({:s})", msg, t1);
 	else
-		snprintf(out, sizeof(out), "%s", msg);
+		out = fmtlib::format("{:s}", msg);
 
 	ODesc d;
-	DoMsg(&d, out);
-	reporter->FatalError("%s", d.Description());
+	DoMsg(&d, out.c_str());
+	reporter->FatalError("{:s}", d.Description());
 	reporter->PopLocation();
 	}
 
@@ -101,9 +101,9 @@ void BroObj::Internal(const char* msg) const
 	auto rcs = render_call_stack();
 
 	if ( rcs.empty() )
-		reporter->InternalError("%s", d.Description());
+		reporter->InternalError("{:s}", d.Description());
 	else
-		reporter->InternalError("%s, call stack: %s", d.Description(), rcs.data());
+		reporter->InternalError("{:s}, call stack: {:s}", d.Description(), rcs);
 
 	reporter->PopLocation();
 	}
@@ -112,7 +112,7 @@ void BroObj::InternalWarning(const char* msg) const
 	{
 	ODesc d;
 	DoMsg(&d, msg);
-	reporter->InternalWarning("%s", d.Description());
+	reporter->InternalWarning("{:s}", d.Description());
 	reporter->PopLocation();
 	}
 
@@ -198,7 +198,7 @@ void print(const BroObj* obj)
 
 void bad_ref(int type)
 	{
-	reporter->InternalError("bad reference count [%d]", type);
+	reporter->InternalError("bad reference count [{:d}]", type);
 	abort();
 	}
 

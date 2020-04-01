@@ -118,7 +118,7 @@ void* PrefixTable::Lookup(const Val* value, bool exact) const
 		break;
 
 	default:
-		reporter->InternalWarning("Wrong index type %d for PrefixTable",
+		reporter->InternalWarning("Wrong index type {:d} for PrefixTable",
 		                          value->Type()->Tag());
 		return 0;
 	}

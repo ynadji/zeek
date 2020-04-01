@@ -39,7 +39,7 @@ static void write_analyzer_component(FILE* f, const analyzer::Component* c)
 	string tag = fmt("ANALYZER_%s", c->CanonicalName().c_str());
 
 	if ( atag->Lookup("Analyzer", tag.c_str()) < 0 )
-		reporter->InternalError("missing analyzer tag for %s", tag.c_str());
+		reporter->InternalError("missing analyzer tag for {:s}", tag);
 
 	fprintf(f, ":zeek:enum:`Analyzer::%s`\n\n", tag.c_str());
 	}
@@ -50,7 +50,7 @@ static void write_analyzer_component(FILE* f, const file_analysis::Component* c)
 	string tag = fmt("ANALYZER_%s", c->CanonicalName().c_str());
 
 	if ( atag->Lookup("Files", tag.c_str()) < 0 )
-		reporter->InternalError("missing analyzer tag for %s", tag.c_str());
+		reporter->InternalError("missing analyzer tag for {:s}", tag);
 
 	fprintf(f, ":zeek:enum:`Files::%s`\n\n", tag.c_str());
 	}
@@ -132,8 +132,8 @@ static void write_plugin_bif_items(FILE* f, const plugin::Plugin* p,
 		if ( doc )
 			fprintf(f, "%s\n\n", doc->ReStructuredText().c_str());
 		else
-			reporter->InternalWarning("Zeekygen ID lookup failed: %s\n",
-			                          it->GetID().c_str());
+			reporter->InternalWarning("Zeekygen ID lookup failed: {:s}\n",
+			                          it->GetID());
 		}
 	}
 
@@ -144,8 +144,7 @@ static void WriteAnalyzerTagDefn(FILE* f, const string& module)
 	zeekygen::IdentifierInfo* doc = zeekygen_mgr->GetIdentifierInfo(tag_id);
 
 	if ( ! doc )
-		reporter->InternalError("Zeekygen failed analyzer tag lookup: %s",
-		                        tag_id.c_str());
+		reporter->InternalError("Zeekygen failed analyzer tag lookup: {:s}", tag_id);
 
 	fprintf(f, "%s\n", doc->ReStructuredText().c_str());
 	}
@@ -197,15 +196,14 @@ TargetFile::TargetFile(const string& arg_name)
 		string dir = SafeDirname(name).result;
 
 		if ( ! ensure_intermediate_dirs(dir.c_str()) )
-			reporter->FatalError("Zeekygen failed to make dir %s",
-			                     dir.c_str());
+			reporter->FatalError("Zeekygen failed to make dir {:s}", dir);
 		}
 
 	f = fopen(name.c_str(), "w");
 
 	if ( ! f )
-		reporter->FatalError("Zeekygen failed to open '%s' for writing: %s",
-		                     name.c_str(), strerror(errno));
+		reporter->FatalError("Zeekygen failed to open '{:s}' for writing: {:s}",
+		                     name, strerror(errno));
 	}
 
 TargetFile::~TargetFile()
@@ -316,8 +314,8 @@ void PackageTarget::DoFindDependencies(const vector<Info*>& infos)
 	pkg_deps = filter_matches<PackageInfo>(infos, this);
 
 	if ( pkg_deps.empty() )
-		reporter->FatalError("No match for Zeekygen target '%s' pattern '%s'",
-		                     Name().c_str(), Pattern().c_str());
+		reporter->FatalError("No match for Zeekygen target '{:s}' pattern '{:s}'",
+		                     Name(), Pattern());
 
 	for ( size_t i = 0; i < infos.size(); ++i )
 		{
@@ -385,8 +383,8 @@ void PackageIndexTarget::DoFindDependencies(const vector<Info*>& infos)
 	pkg_deps = filter_matches<PackageInfo>(infos, this);
 
 	if ( pkg_deps.empty() )
-		reporter->FatalError("No match for Zeekygen target '%s' pattern '%s'",
-		                     Name().c_str(), Pattern().c_str());
+		reporter->FatalError("No match for Zeekygen target '{:s}' pattern '{:s}'",
+		                     Name(), Pattern());
 	}
 
 void PackageIndexTarget::DoGenerate() const
@@ -405,8 +403,8 @@ void ScriptTarget::DoFindDependencies(const vector<Info*>& infos)
 	script_deps = filter_matches<ScriptInfo>(infos, this);
 
 	if ( script_deps.empty() )
-		reporter->FatalError("No match for Zeekygen target '%s' pattern '%s'",
-		                     Name().c_str(), Pattern().c_str());
+		reporter->FatalError("No match for Zeekygen target '{:s}' pattern '{:s}'",
+		                     Name(), Pattern());
 
 	if ( ! IsDir() )
 		return;
@@ -444,7 +442,7 @@ vector<string> dir_contents_recursive(string dir)
 
 	if ( ! fts )
 		{
-		reporter->Error("fts_open failure: %s", strerror(errno));
+		reporter->Error("fts_open failure: {:s}", strerror(errno));
 		delete [] scan_path;
 		delete [] dir_copy;
 		return rval;
@@ -459,10 +457,10 @@ vector<string> dir_contents_recursive(string dir)
 		}
 
 	if ( errno )
-		reporter->Error("fts_read failure: %s", strerror(errno));
+		reporter->Error("fts_read failure: {:s}", strerror(errno));
 
 	if ( fts_close(fts) < 0 )
-		reporter->Error("fts_close failure: %s", strerror(errno));
+		reporter->Error("fts_close failure: {:s}", strerror(errno));
 
 	delete [] scan_path;
 	delete [] dir_copy;
@@ -508,8 +506,7 @@ void ScriptTarget::DoGenerate() const
 				continue;
 
 			if ( unlink(f.c_str()) < 0 )
-				reporter->Warning("Failed to unlink %s: %s", f.c_str(),
-				                  strerror(errno));
+				reporter->Warning("Failed to unlink {:s}: {:s}", f, strerror(errno));
 
 			DBG_LOG(DBG_ZEEKYGEN, "Delete stale script file %s", f.c_str());
 			}
@@ -580,8 +577,8 @@ void IdentifierTarget::DoFindDependencies(const vector<Info*>& infos)
 	id_deps = filter_matches<IdentifierInfo>(infos, this);
 
 	if ( id_deps.empty() )
-		reporter->FatalError("No match for Zeekygen target '%s' pattern '%s'",
-		                     Name().c_str(), Pattern().c_str());
+		reporter->FatalError("No match for Zeekygen target '{:s}' pattern '{:s}'",
+		                     Name(), Pattern());
 	}
 
 void IdentifierTarget::DoGenerate() const

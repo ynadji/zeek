@@ -697,7 +697,7 @@ expr:
 			else
 				{
 				if ( id->IsDeprecated() )
-					reporter->Warning("%s", id->GetDeprecationWarning().c_str());
+					reporter->Warning("{:s}", id->GetDeprecationWarning());
 
 				if ( ! id->Type() )
 					{
@@ -712,7 +712,7 @@ expr:
 					int intval = t->Lookup(id->ModuleName(),
 							       id->Name());
 					if ( intval < 0 )
-						reporter->InternalError("enum value not found for %s", id->Name());
+						reporter->InternalError("enum value not found for {:s}", id->Name());
 					$$ = new ConstExpr(t->GetVal(intval));
 					}
 				else
@@ -1020,7 +1020,7 @@ type:
 				Ref($$);
 
 				if ( $1->IsDeprecated() )
-					reporter->Warning("%s", $1->GetDeprecationWarning().c_str());
+					reporter->Warning("{:s}", $1->GetDeprecationWarning());
 				}
 			}
 	;
@@ -1194,7 +1194,7 @@ func_hdr:
 			if ( streq("bro_init", name) || streq("bro_done", name) || streq("bro_script_loaded", name) )
 				{
 				auto base = std::string(name).substr(4);
-				reporter->Error("event %s() is no longer available, use zeek_%s() instead", name, base.c_str());
+				reporter->Error("event {:s}() is no longer available, use zeek_{:s}() instead", name, base);
 				}
 
 			begin_func($2, current_module.c_str(),
@@ -1391,7 +1391,7 @@ attr:
 				ODesc d;
 				$3->Describe(&d);
 				Unref($3);
-				reporter->Error("'&deprecated=%s' must use a string literal",
+				reporter->Error("'&deprecated={:s}' must use a string literal",
 				                d.Description());
 				$$ = new Attr(ATTR_DEPRECATED);
 				}
@@ -1612,7 +1612,7 @@ event:
 					}
 
 				if ( id->IsDeprecated() )
-					reporter->Warning("%s", id->GetDeprecationWarning().c_str());
+					reporter->Warning("{:s}", id->GetDeprecationWarning());
 				}
 
 			$$ = new EventExpr($1, {AdoptRef{}, $3});
@@ -1821,7 +1821,7 @@ global_or_event_id:
 
 					if ( t->Tag() != TYPE_FUNC ||
 					     t->AsFuncType()->Flavor() != FUNC_FLAVOR_FUNCTION )
-						reporter->Warning("%s", $$->GetDeprecationWarning().c_str());
+						reporter->Warning("{:s}", $$->GetDeprecationWarning());
 					}
 
 				delete [] $1;
@@ -1847,7 +1847,7 @@ resolve_id:
 			$$ = lookup_ID($1, current_module.c_str()).release();
 
 			if ( ! $$ )
-				reporter->Error("identifier not defined: %s", $1);
+				reporter->Error("identifier not defined: {:s}", $1);
 
 			delete [] $1;
 			}
@@ -1877,7 +1877,7 @@ opt_deprecated:
 				{
 				ODesc d;
 				$3->Describe(&d);
-				reporter->Error("'&deprecated=%s' must use a string literal",
+				reporter->Error("'&deprecated={:s}' must use a string literal",
 				                d.Description());
 				$$ = new ConstExpr(make_intrusive<StringVal>(""));
 				}
@@ -1893,22 +1893,22 @@ int yyerror(const char msg[])
 		g_curr_debug_error = copy_string(msg);
 
 	if ( last_tok[0] == '\n' )
-		reporter->Error("%s, on previous line", msg);
+		reporter->Error("{:s}, on previous line", msg);
 	else if ( last_tok[0] == '\0' )
 		{
 		if ( last_filename )
-			reporter->Error("%s, at end of file %s", msg, last_filename);
+			reporter->Error("{:s}, at end of file {:s}", msg, last_filename);
 		else
-			reporter->Error("%s, at end of file", msg);
+			reporter->Error("{:s}, at end of file", msg);
 		}
 	else
 		{
 		if ( last_last_tok_filename && last_tok_filename &&
 		     ! streq(last_last_tok_filename, last_tok_filename) )
-			reporter->Error("%s, at or near \"%s\" or end of file %s",
+			reporter->Error("{:s}, at or near \"{:s}\" or end of file {:s}",
 			                msg, last_tok, last_last_tok_filename);
 		else
-			reporter->Error("%s, at or near \"%s\"", msg, last_tok);
+			reporter->Error("{:s}, at or near \"{:s}\"", msg, last_tok);
 		}
 
 	return 0;

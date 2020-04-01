@@ -70,11 +70,11 @@ char last_tok[128];
 // a read fails.
 #define YY_INPUT(buf,result,max_size) \
 	if ( ((result = fread(buf, 1, max_size, yyin)) == 0) && ferror(yyin) ) \
-		reporter->Error("read failed with \"%s\"", strerror(errno));
+		reporter->Error("read failed with \"{:s}\"", strerror(errno));
 
 static void deprecated_attr(const char* attr)
 	{
-	reporter->Warning("Use of deprecated attribute: %s", attr);
+	reporter->Warning("Use of deprecated attribute: {:s}", attr);
 	}
 
 static string find_relative_file(const string& filename, const string& ext)
@@ -104,7 +104,7 @@ static ZeekINode get_inode(FILE* f, const string& path)
 	struct stat b;
 
 	if ( fstat(fileno(f), &b) )
-		reporter->FatalError("fstat of %s failed: %s\n", path.c_str(),
+		reporter->FatalError("fstat of {:s} failed: {:s}\n", path.c_str(),
 		                     strerror(errno));
 
 	return {b.st_dev, b.st_ino};
@@ -115,7 +115,7 @@ static ZeekINode get_inode(const string& path)
 	FILE* f = open_file(path);
 
 	if ( ! f )
-		reporter->FatalError("failed to open %s\n", path.c_str());
+		reporter->FatalError("failed to open {:s}\n", path.c_str());
 
 	auto inode = get_inode(f, path);
 	fclose(f);
@@ -320,13 +320,13 @@ when	return TOK_WHEN;
 		auto lf = file_stack[num_files - 1];
 
 		if ( lf->name )
-			reporter->Warning("deprecated script loaded from %s:%d %s",
+			reporter->Warning("deprecated script loaded from {:s}:{:d} {:s}",
 			                  lf->name, lf->line, comment);
 		else
-			reporter->Warning("deprecated script loaded from command line arguments %s", comment);
+			reporter->Warning("deprecated script loaded from command line arguments {:s}", comment);
 		}
 	else
-		reporter->Warning("deprecated script loaded %s", comment);
+		reporter->Warning("deprecated script loaded {:s}", comment);
 	}
 
 @DEBUG	return TOK_DEBUG;	// marks input for debugger
@@ -339,7 +339,7 @@ when	return TOK_WHEN;
 		char path[MAXPATHLEN];
 
 		if ( ! getcwd(path, MAXPATHLEN) )
-			reporter->InternalError("getcwd failed: %s", strerror(errno));
+			reporter->InternalError("getcwd failed: {:s}", strerror(errno));
 		else
 			rval = string(path) + "/" + rval;
 		}
@@ -368,7 +368,7 @@ when	return TOK_WHEN;
 	case -1:
 		// No plugin in charge of this file.
 		if ( path.empty() )
-			reporter->Error("failed to find file associated with @load-sigs %s",
+			reporter->Error("failed to find file associated with @load-sigs {:s}",
 			                file);
 		else
 			sig_files.push_back(copy_string(path.c_str()));
@@ -376,7 +376,7 @@ when	return TOK_WHEN;
 
 	case 0:
 		if ( ! reporter->Errors() )
-			reporter->Error("Plugin reported error loading signatures %s", file);
+			reporter->Error("Plugin reported error loading signatures {:s}", file);
 
 		exit(1);
 		break;
@@ -403,7 +403,7 @@ when	return TOK_WHEN;
 
 	case 0:
 		if ( ! reporter->Errors() )
-			reporter->Error("Plugin reported error loading plugin %s", plugin);
+			reporter->Error("Plugin reported error loading plugin {:s}", plugin);
 
 		exit(1);
 		break;
@@ -424,7 +424,7 @@ when	return TOK_WHEN;
 	string path = find_relative_script_file(file);
 
 	if ( path.empty() )
-		reporter->Error("failed find file associated with @unload %s", file);
+		reporter->Error("failed find file associated with @unload {:s}", file);
 	else
 		{
 		// All we have to do is pretend we've already scanned it.
@@ -484,7 +484,7 @@ F	RET_CONST(val_mgr->GetFalse())
 		uint32_t p = atoi(yytext);
 		if ( p > 65535 )
 			{
-			reporter->Error("bad port number - %s", yytext);
+			reporter->Error("bad port number - {:s}", yytext);
 			p = 0;
 			}
 		RET_CONST(val_mgr->GetPort(p, TRANSPORT_TCP))
@@ -493,7 +493,7 @@ F	RET_CONST(val_mgr->GetFalse())
 		uint32_t p = atoi(yytext);
 		if ( p > 65535 )
 			{
-			reporter->Error("bad port number - %s", yytext);
+			reporter->Error("bad port number - {:s}", yytext);
 			p = 0;
 			}
 		RET_CONST(val_mgr->GetPort(p, TRANSPORT_UDP))
@@ -502,7 +502,7 @@ F	RET_CONST(val_mgr->GetFalse())
 		uint32_t p = atoi(yytext);
 		if ( p > 255 )
 			{
-			reporter->Error("bad port number - %s", yytext);
+			reporter->Error("bad port number - {:s}", yytext);
 			p = 0;
 			}
 		RET_CONST(val_mgr->GetPort(p, TRANSPORT_ICMP))
@@ -511,7 +511,7 @@ F	RET_CONST(val_mgr->GetFalse())
 		uint32_t p = atoi(yytext);
 		if ( p > 255 )
 			{
-			reporter->Error("bad port number - %s", yytext);
+			reporter->Error("bad port number - {:s}", yytext);
 			p = 0;
 			}
 		RET_CONST(val_mgr->GetPort(p, TRANSPORT_UNKNOWN))
@@ -580,7 +580,7 @@ F	RET_CONST(val_mgr->GetFalse())
 
 <RE>[\\\n]	return yytext[0];	// should cause a parse error
 
-<*>.	reporter->Error("unrecognized character - %s", yytext);
+<*>.	reporter->Error("unrecognized character - {:s}", yytext);
 
 <<EOF>>	last_tok[0] = '\0'; return EOF;
 
@@ -624,7 +624,7 @@ static int load_files(const char* orig_file)
 			// This is just in case the plugin failed to report
 			// the error itself, in which case we want to at
 			// least tell the user that something went wrong.
-			reporter->Error("Plugin reported error loading %s", orig_file);
+			reporter->Error("Plugin reported error loading {:s}", orig_file);
 
 		exit(1);
 		}
@@ -651,7 +651,7 @@ static int load_files(const char* orig_file)
 	else
 		{
 		if ( file_path.empty() )
-			reporter->FatalError("can't find %s", orig_file);
+			reporter->FatalError("can't find {:s}", orig_file);
 
 		if ( is_dir(file_path.c_str()) )
 			f = open_package(file_path);
@@ -659,7 +659,7 @@ static int load_files(const char* orig_file)
 			f = open_file(file_path);
 
 		if ( ! f )
-			reporter->FatalError("can't open %s", file_path.c_str());
+			reporter->FatalError("can't open {:s}", file_path.c_str());
 		}
 
 	auto i = get_inode(f, file_path);

@@ -464,15 +464,15 @@ Analyzer* Manager::InstantiateAnalyzer(const Tag& tag, RecordVal* args, File* f)
 	if ( ! c )
 		{
 		reporter->InternalWarning(
-		            "unknown file analyzer instantiation request: %s",
-		            tag.AsString().c_str());
+		            "unknown file analyzer instantiation request: {:s}",
+		            tag.AsString());
 		return 0;
 		}
 
 	if ( ! c->Factory() )
 		{
-		reporter->InternalWarning("file analyzer %s cannot be instantiated "
-					  "dynamically", c->CanonicalName().c_str());
+		reporter->InternalWarning("file analyzer {:s} cannot be instantiated "
+					  "dynamically", c->CanonicalName());
 		return 0;
 		}
 

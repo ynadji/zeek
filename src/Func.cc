@@ -233,13 +233,13 @@ std::pair<bool, Val*> Func::HandlePluginResult(std::pair<bool, Val*> plugin_resu
 	switch ( flavor ) {
 	case FUNC_FLAVOR_EVENT:
 		if( plugin_result.second )
-			reporter->InternalError("plugin returned non-void result for event %s", this->Name());
+			reporter->InternalError("plugin returned non-void result for event {:s}", this->Name());
 
 		break;
 
 	case FUNC_FLAVOR_HOOK:
 		if ( plugin_result.second->Type()->Tag() != TYPE_BOOL )
-			reporter->InternalError("plugin returned non-bool for hook %s", this->Name());
+			reporter->InternalError("plugin returned non-bool for hook {:s}", this->Name());
 
 		break;
 
@@ -250,12 +250,12 @@ std::pair<bool, Val*> Func::HandlePluginResult(std::pair<bool, Val*> plugin_resu
 		if ( (! yt) || yt->Tag() == TYPE_VOID )
 			{
 			if( plugin_result.second )
-				reporter->InternalError("plugin returned non-void result for void method %s", this->Name());
+				reporter->InternalError("plugin returned non-void result for void method {:s}", this->Name());
 			}
 
 		else if ( plugin_result.second && plugin_result.second->Type()->Tag() != yt->Tag() && yt->Tag() != TYPE_ANY)
 			{
-			reporter->InternalError("plugin returned wrong type (got %d, expecting %d) for %s",
+			reporter->InternalError("plugin returned wrong type (got {:d}, expecting {:d}) for {:s}",
 						plugin_result.second->Type()->Tag(), yt->Tag(), this->Name());
 			}
 
@@ -427,8 +427,7 @@ IntrusivePtr<Val> BroFunc::Call(const zeek::Args& args, Frame* parent) const
 		 (flow != FLOW_RETURN /* we fell off the end */ ||
 		  ! result /* explicit return with no result */) &&
 		 ! f->HasDelayed() )
-		reporter->Warning("non-void function returning without a value: %s",
-				  Name());
+		reporter->Warning("non-void function returning without a value: {:s}", Name());
 
 	if ( result && g_trace_state.DoTrace() )
 		{
@@ -491,8 +490,7 @@ bool BroFunc::StrengthenClosureReference(Frame* f)
 void BroFunc::SetClosureFrame(Frame* f)
 	{
 	if ( closure )
-		reporter->InternalError("Tried to override closure for BroFunc %s.",
-					Name());
+		reporter->InternalError("Tried to override closure for BroFunc {:s}.", Name());
 
 	// Have to use weak references initially because otherwise Ref'ing the
 	// original frame creates a circular reference: the function holds a
@@ -584,9 +582,9 @@ BuiltinFunc::BuiltinFunc(built_in_func arg_func, const char* arg_name,
 
 	auto id = lookup_ID(Name(), GLOBAL_MODULE_NAME, false);
 	if ( ! id )
-		reporter->InternalError("built-in function %s missing", Name());
+		reporter->InternalError("built-in function {:s} missing", Name());
 	if ( id->HasVal() )
-		reporter->InternalError("built-in function %s multiply defined", Name());
+		reporter->InternalError("built-in function {:s} multiply defined", Name());
 
 	type = {NewRef{}, id->Type()};
 	id->SetVal(make_intrusive<Val>(this));

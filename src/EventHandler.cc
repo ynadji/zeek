@@ -88,7 +88,7 @@ void EventHandler::Call(const zeek::Args& vl, bool no_remote)
 					{
 					valid_args = false;
 					auto_publish.clear();
-					reporter->Error("failed auto-remote event '%s', disabled", Name());
+					reporter->Error("failed auto-remote event '{:s}', disabled", Name());
 					break;
 					}
 				}

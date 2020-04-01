@@ -88,8 +88,8 @@ function Files::__lookup_file%(fuid: string%): fa_file
 		{
 		return f->GetVal()->Ref();
 		}
-	
-	reporter->Error("file ID %s not a known file", fuid->CheckString());
+
+	reporter->Error("file ID {:s} not a known file", fuid->CheckString());
 	return 0;
 	%}
 

@@ -517,7 +517,7 @@ Val* internal_val(const char* name)
 	auto id = lookup_ID(name, GLOBAL_MODULE_NAME);
 
 	if ( ! id )
-		reporter->InternalError("internal variable %s missing", name);
+		reporter->InternalError("internal variable {:s} missing", name);
 
 	return id->ID_Val();
 	}
@@ -546,10 +546,10 @@ Val* internal_const_val(const char* name)
 	{
 	auto id = lookup_ID(name, GLOBAL_MODULE_NAME);
 	if ( ! id )
-		reporter->InternalError("internal variable %s missing", name);
+		reporter->InternalError("internal variable {:s} missing", name);
 
 	if ( ! id->IsConst() )
-		reporter->InternalError("internal variable %s is not constant", name);
+		reporter->InternalError("internal variable {:s} is not constant", name);
 
 	return id->ID_Val();
 	}
@@ -611,7 +611,7 @@ ListVal* internal_list_val(const char* name)
 			}
 
 		else
-			reporter->InternalError("internal variable %s is not a list", name);
+			reporter->InternalError("internal variable {:s} is not a list", name);
 		}
 
 	return nullptr;
@@ -621,7 +621,7 @@ BroType* internal_type(const char* name)
 	{
 	auto id = lookup_ID(name, GLOBAL_MODULE_NAME);
 	if ( ! id )
-		reporter->InternalError("internal type %s missing", name);
+		reporter->InternalError("internal type {:s} missing", name);
 
 	return id->Type();
 	}

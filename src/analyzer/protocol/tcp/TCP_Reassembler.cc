@@ -102,7 +102,7 @@ void TCP_Reassembler::SetContentsFile(BroFile* f)
 	{
 	if ( ! f->IsOpen() )
 		{
-		reporter->Error("no such file \"%s\"", f->Name());
+		reporter->Error("no such file \"{:s}\"", f->Name());
 		return;
 		}
 

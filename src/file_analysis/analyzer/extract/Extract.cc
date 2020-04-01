@@ -22,7 +22,7 @@ Extract::Extract(RecordVal* args, File* file, const string& arg_filename,
 		fd = 0;
 		char buf[128];
 		bro_strerror_r(errno, buf, sizeof(buf));
-		reporter->Error("cannot open %s: %s", filename.c_str(), buf);
+		reporter->Error("cannot open {:s}: {:s}", filename, buf);
 		}
 	}
 
@@ -37,7 +37,7 @@ static IntrusivePtr<Val> get_extract_field_val(RecordVal* args, const char* name
 	auto rval = args->Lookup(name);
 
 	if ( ! rval )
-		reporter->Error("File extraction analyzer missing arg field: %s", name);
+		reporter->Error("File extraction analyzer missing arg field: {:s}", name);
 
 	return rval;
 	}

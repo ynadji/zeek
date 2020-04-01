@@ -355,7 +355,7 @@ private:
 		if ( script_scope )
 			builtin_error(msg);
 		else
-			reporter->Error("%s", msg);
+			reporter->Error("{:s}", msg);
 		}
 
 	// IOSource interface overrides:

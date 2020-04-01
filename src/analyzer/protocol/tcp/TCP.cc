@@ -1623,8 +1623,7 @@ BroFile* TCP_Analyzer::GetContentsFile(unsigned int direction) const
 		break;
 	}
 
-	reporter->Error("bad direction %u in TCP_Analyzer::GetContentsFile",
-	                direction);
+	reporter->Error("bad direction {:d} in TCP_Analyzer::GetContentsFile", direction);
 	return 0;
 	}
 

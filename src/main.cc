@@ -317,7 +317,7 @@ void terminate_bro()
 void zeek_terminate_loop(const char* reason)
 	{
 	set_processing_status("TERMINATING", reason);
-	reporter->Info("%s", reason);
+	reporter->Info("{:s}", reason);
 
 	net_get_final_stats();
 	done_with_network();
@@ -544,7 +544,7 @@ int main(int argc, char** argv)
 	int r = sqlite3_initialize();
 
 	if ( r != SQLITE_OK )
-		reporter->Error("Failed to initialize sqlite3: %s", sqlite3_errstr(r));
+		reporter->Error("Failed to initialize sqlite3: {:s}", sqlite3_errstr(r));
 
 #ifdef USE_IDMEF
 	char* libidmef_dtd_path_cstr = new char[options.libidmef_dtd_file.size() + 1];
@@ -799,7 +799,7 @@ int main(int argc, char** argv)
 		{
 		ID* id = global_scope()->Lookup(*options.identifier_to_print);
 		if ( ! id )
-			reporter->FatalError("No such ID: %s\n", options.identifier_to_print->data());
+			reporter->FatalError("No such ID: {:s}\n", *(options.identifier_to_print));
 
 		ODesc desc;
 		desc.SetQuotes(true);
@@ -834,7 +834,7 @@ int main(int argc, char** argv)
 	if ( ! dead_handlers.empty() && check_for_unused_event_handlers )
 		{
 		for ( const string& handler : dead_handlers )
-			reporter->Warning("event handler never invoked: %s", handler.c_str());
+			reporter->Warning("event handler never invoked: {:s}", handler);
 		}
 
 	// Enable LeakSanitizer before zeek_init() and even before executing

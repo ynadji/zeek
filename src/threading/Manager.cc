@@ -160,7 +160,7 @@ void Manager::Flush()
 
 			else
 				{
-				reporter->Error("%s failed, terminating thread", msg->Name());
+				reporter->Error("{:s} failed, terminating thread", msg->Name());
 				t->SignalStop();
 				}
 

@@ -37,7 +37,7 @@ static IntrusivePtr<Val> get_ocsp_type(RecordVal* args, const char* name)
 	auto rval = args->Lookup(name);
 
 	if ( ! rval )
-		reporter->Error("File extraction analyzer missing arg field: %s", name);
+		reporter->Error("File extraction analyzer missing arg field: {:s}", name);
 
 	return rval;
 	}

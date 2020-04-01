@@ -1290,7 +1290,7 @@ void NetSessions::Weird(const char* name, const Packet* pkt,
 		dump_this_packet = 1;
 
 	if ( encap && encap->LastType() != BifEnum::Tunnel::NONE )
-		reporter->Weird(fmt("%s_in_tunnel", name), addl);
+		reporter->Weird(fmt2("{:s}_in_tunnel", name), addl);
 	else
 		reporter->Weird(name, addl);
 	}
@@ -1300,7 +1300,7 @@ void NetSessions::Weird(const char* name, const IP_Hdr* ip,
 	{
 	if ( encap && encap->LastType() != BifEnum::Tunnel::NONE )
 		reporter->Weird(ip->SrcAddr(), ip->DstAddr(),
-		                fmt("%s_in_tunnel", name), addl);
+		                fmt2("{:s}_in_tunnel", name), addl);
 	else
 		reporter->Weird(ip->SrcAddr(), ip->DstAddr(), name, addl);
 	}

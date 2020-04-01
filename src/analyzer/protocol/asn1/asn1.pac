@@ -120,7 +120,7 @@ Val* asn1_integer_to_val(const ASN1Encoding* i, TypeTag t)
 	case TYPE_COUNTER:
 		return val_mgr->GetCount(v);
 	default:
-		reporter->Error("bad asn1_integer_to_val tag: %s", type_name(t));
+		reporter->Error("bad asn1_integer_to_val tag: {:s}", type_name(t));
 		return val_mgr->GetCount(v);
 	}
 	}

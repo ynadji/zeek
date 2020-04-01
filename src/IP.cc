@@ -723,7 +723,7 @@ VectorVal* IPv6_Hdr_Chain::BuildVal() const
 			break;
 #endif
 		default:
-			reporter->InternalWarning("IPv6_Hdr_Chain bad header %d", type);
+			reporter->InternalWarning("IPv6_Hdr_Chain bad header {:d}", type);
 			Unref(ext_hdr);
 			continue;
 		}

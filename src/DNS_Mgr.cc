@@ -446,7 +446,7 @@ void DNS_Mgr::InitSource()
 		}
 	else
 		{
-		reporter->Warning("problem initializing NB-DNS: %s", err);
+		reporter->Warning("problem initializing NB-DNS: {:s}", err);
 		}
 
 	did_init = true;
@@ -518,7 +518,7 @@ IntrusivePtr<TableVal> DNS_Mgr::LookupHost(const char* name)
 
 			if ( (d4 && d4->Failed()) || (d6 && d6->Failed()) )
 				{
-				reporter->Warning("no such host: %s", name);
+				reporter->Warning("no such host: {:s}", name);
 				return empty_addr_set();
 				}
 			else if ( d4 && d6 )
@@ -539,7 +539,7 @@ IntrusivePtr<TableVal> DNS_Mgr::LookupHost(const char* name)
 		return empty_addr_set();
 
 	case DNS_FORCE:
-		reporter->FatalError("can't find DNS entry for %s in cache", name);
+		reporter->FatalError("can't find DNS entry for {:s} in cache", name);
 		return 0;
 
 	case DNS_DEFAULT:
@@ -570,7 +570,7 @@ IntrusivePtr<Val> DNS_Mgr::LookupAddr(const IPAddr& addr)
 			else
 				{
 				string s(addr);
-				reporter->Warning("can't resolve IP address: %s", s.c_str());
+				reporter->Warning("can't resolve IP address: {:s}", s);
 				return make_intrusive<StringVal>(s.c_str());
 				}
 			}
@@ -583,8 +583,8 @@ IntrusivePtr<Val> DNS_Mgr::LookupAddr(const IPAddr& addr)
 		return make_intrusive<StringVal>("<none>");
 
 	case DNS_FORCE:
-		reporter->FatalError("can't find DNS entry for %s in cache",
-		    addr.AsString().c_str());
+		reporter->FatalError("can't find DNS entry for {:s} in cache",
+			addr.AsString());
 		return 0;
 
 	case DNS_DEFAULT:
@@ -654,9 +654,7 @@ void DNS_Mgr::Resolve()
 		struct nb_dns_result r;
 		status = nb_dns_activity(nb_dns, &r, err);
 		if ( status < 0 )
-			reporter->Warning(
-			    "NB-DNS error in DNS_Mgr::WaitForReplies (%s)",
-			    err);
+			reporter->Warning("NB-DNS error in DNS_Mgr::WaitForReplies ({:s})", err);
 		else if ( status > 0 )
 			{
 			DNS_Mgr_Request* dr = (DNS_Mgr_Request*) r.cookie;
@@ -1390,7 +1388,7 @@ void DNS_Mgr::Process()
 	int status = nb_dns_activity(nb_dns, &r, err);
 
 	if ( status < 0 )
-		reporter->Warning("NB-DNS error in DNS_Mgr::Process (%s)", err);
+		reporter->Warning("NB-DNS error in DNS_Mgr::Process ({:s})", err);
 
 	else if ( status > 0 )
 		{

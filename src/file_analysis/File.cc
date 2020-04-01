@@ -179,8 +179,7 @@ int File::Idx(const string& field, const RecordType* type)
 	int rval = type->FieldOffset(field.c_str());
 
 	if ( rval < 0 )
-		reporter->InternalError("Unknown %s field: %s", type->GetName().c_str(),
-		                        field.c_str());
+		reporter->InternalError("Unknown {:s} field: {:s}", type->GetName(), field);
 
 	return rval;
 	}

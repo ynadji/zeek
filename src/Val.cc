@@ -740,7 +740,7 @@ uint32_t PortVal::Mask(uint32_t port_num, TransportProto port_type)
 
 	if ( port_num >= 65536 )
 		{
-		reporter->Warning("bad port number %d", port_num);
+		reporter->Warning("bad port number {:d}", port_num);
 		port_num = 0;
 		}
 
@@ -863,7 +863,7 @@ IntrusivePtr<Val> AddrVal::DoClone(CloneState* state)
 SubNetVal::SubNetVal(const char* text) : Val(new IPPrefix(), TYPE_SUBNET)
 	{
 	if ( ! IPPrefix::ConvertString(text, val.subnet_val) )
-		reporter->Error("Bad string in SubNetVal ctor: %s", text);
+		reporter->Error("Bad string in SubNetVal ctor: {:s}", text);
 	}
 
 SubNetVal::SubNetVal(const char* text, int width) : Val(new IPPrefix(text, width), TYPE_SUBNET)
@@ -2746,7 +2746,7 @@ IntrusivePtr<Val> RecordVal::Lookup(const char* field, bool with_default) const
 	int idx = Type()->AsRecordType()->FieldOffset(field);
 
 	if ( idx < 0 )
-		reporter->InternalError("missing record field: %s", field);
+		reporter->InternalError("missing record field: {:s}", field);
 
 	return with_default ? LookupWithDefault(idx) : IntrusivePtr{NewRef{}, Lookup(idx)};
 	}
@@ -3450,7 +3450,7 @@ PortVal* ValManager::GetPort(uint32_t port_num, TransportProto port_type) const
 	{
 	if ( port_num >= 65536 )
 		{
-		reporter->Warning("bad port number %d", port_num);
+		reporter->Warning("bad port number {:d}", port_num);
 		port_num = 0;
 		}
 

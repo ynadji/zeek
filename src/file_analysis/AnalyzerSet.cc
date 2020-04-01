@@ -181,9 +181,8 @@ file_analysis::Analyzer* AnalyzerSet::InstantiateAnalyzer(const Tag& tag,
 
 	if ( ! a )
 		{
-		reporter->Error("[%s] Failed file analyzer %s instantiation",
-		                file->GetID().c_str(),
-		                file_mgr->GetComponentName(tag).c_str());
+		reporter->Error("[{:s}] Failed file analyzer {:s} instantiation",
+		                file->GetID(), file_mgr->GetComponentName(tag));
 		return 0;
 		}
 

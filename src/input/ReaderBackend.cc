@@ -67,7 +67,7 @@ public:
 		bool success = input_mgr->SendEvent(Object(), name, num_vals, val);
 
 		if ( ! success )
-			reporter->Error("SendEvent for event %s failed", name);
+			reporter->Error("SendEvent for event {:s} failed", name);
 
 		return true; // We do not want to die if sendEvent fails because the event did not return.
 		}

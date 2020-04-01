@@ -248,7 +248,7 @@ bool Manager::CreateStream(EnumVal* id, RecordVal* sval)
 
 		if ( ! threading::Value::IsCompatibleType(columns->FieldType(i)) )
 			{
-			reporter->Error("type of field '%s' is not support for logging output",
+			reporter->Error("type of field '{:s}' is not support for logging output",
 				 columns->FieldName(i));
 
 			return false;
@@ -597,7 +597,7 @@ bool Manager::AddFilter(EnumVal* id, RecordVal* fval)
 			}
 		else
 			{
-			reporter->Error("Return value of log_ext is not a record (got %s)", type_name(filter->ext_func->FType()->YieldType()->Tag()));
+			reporter->Error("Return value of log_ext is not a record (got {:s})", type_name(filter->ext_func->FType()->YieldType()->Tag()));
 			delete filter;
 			return false;
 			}
@@ -803,10 +803,9 @@ bool Manager::Write(EnumVal* id, RecordVal* columns_arg)
 			Unref(filter->path_val);
 			filter->path_val = new StringVal(new_path.c_str());
 
-			reporter->Warning("Write using filter '%s' on path '%s' changed to"
-			  " use new path '%s' to avoid conflict with filter '%s'",
-			  filter->name.c_str(), path.c_str(), new_path.c_str(),
-			  instantiator.c_str());
+			reporter->Warning("Write using filter '{:s}' on path '{:s}' changed to"
+			  " use new path '{:s}' to avoid conflict with filter '{:s}'",
+			  filter->name, path, new_path, instantiator);
 
 			path = filter->path = filter->path_val->AsString()->CheckString();
 			}
@@ -1045,7 +1044,7 @@ threading::Value* Manager::ValToLogVal(Val* val, BroType* ty)
 		}
 
 	default:
-		reporter->InternalError("unsupported type %s for log_write", type_name(lval->type));
+		reporter->InternalError("unsupported type {:s} for log_write", type_name(lval->type));
 	}
 
 	return lval;
