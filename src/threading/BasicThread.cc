@@ -19,9 +19,6 @@ BasicThread::BasicThread()
 	terminating = false;
 	killed = false;
 
-	buf_len = STD_FMT_BUF_LEN;
-	buf = (char*) safe_malloc(buf_len);
-
 	strerr_buffer = 0;
 
 	name = copy_string(fmt("thread-%" PRIu64, ++thread_counter));
@@ -31,9 +28,6 @@ BasicThread::BasicThread()
 
 BasicThread::~BasicThread()
 	{
-	if ( buf )
-		free(buf);
-
 	delete [] name;
 	delete [] strerr_buffer;
 	}

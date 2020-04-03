@@ -144,14 +144,16 @@ bool Ascii::OpenFile()
 
 	if ( ! file.is_open() )
 		{
-		FailWarn(fail_on_file_problem, Fmt("Init: cannot open %s", fname.c_str()), true);
+		const char* msg = Fmt2("Init: cannot open {:s}", fname);
+		FailWarn(fail_on_file_problem, msg, true);
 
 		return ! fail_on_file_problem;
 		}
 
 	if ( ReadHeader(false) == false )
 		{
-		FailWarn(fail_on_file_problem, Fmt("Init: cannot open %s; problem reading file header", fname.c_str()), true);
+		const char* msg = Fmt2("Init: cannot open {:s}; problem reading file header", fname);
+		FailWarn(fail_on_file_problem, msg, true);
 
 		file.close();
 		return ! fail_on_file_problem;
@@ -171,8 +173,8 @@ bool Ascii::ReadHeader(bool useCached)
 		{
 		if ( ! GetLine(line) )
 			{
-			FailWarn(fail_on_file_problem, Fmt("Could not read input data file %s; first line could not be read",
-							   fname.c_str()), true);
+			const char* msg = Fmt2("Could not read input data file {:s}; first line could not be read", fname);
+			FailWarn(fail_on_file_problem, msg, true);
 			return false;
 			}
 
@@ -214,8 +216,8 @@ bool Ascii::ReadHeader(bool useCached)
 				continue;
 				}
 
-			FailWarn(fail_on_file_problem, Fmt("Did not find requested field %s in input data file %s.",
-							   field->name, fname.c_str()), true);
+			FailWarn(fail_on_file_problem, Fmt2("Did not find requested field {:s} in input data file {:s}.",
+							   field->name, fname), true);
 
 			return false;
 			}
@@ -227,8 +229,8 @@ bool Ascii::ReadHeader(bool useCached)
 			map<string, uint32_t>::iterator fit2 = ifields.find(field->secondary_name);
 			if ( fit2 == ifields.end() )
 				{
-				FailWarn(fail_on_file_problem, Fmt("Could not find requested port type field %s in input data file %s.",
-				                                   field->secondary_name, fname.c_str()), true);
+				FailWarn(fail_on_file_problem, Fmt2("Could not find requested port type field {:s} in input data file {:s}.",
+				                                   field->secondary_name, fname), true);
 
 				return false;
 				}
@@ -279,7 +281,7 @@ bool Ascii::DoUpdate()
 			struct stat sb;
 			if ( stat(fname.c_str(), &sb) == -1 )
 				{
-				FailWarn(fail_on_file_problem, Fmt("Could not get stat for %s", fname.c_str()), true);
+				FailWarn(fail_on_file_problem, Fmt2("Could not get stat for {:s}", fname), true);
 
 				file.close();
 				return ! fail_on_file_problem;
@@ -375,8 +377,9 @@ bool Ascii::DoUpdate()
 
 			if ( (*fit).position > pos || (*fit).secondary_position > pos )
 				{
-				FailWarn(fail_on_invalid_lines, Fmt("Not enough fields in line '%s' of %s. Found %d fields, want positions %d and %d",
-				                                    line.c_str(), fname.c_str(), pos, (*fit).position, (*fit).secondary_position));
+				FailWarn(fail_on_invalid_lines,
+					Fmt2("Not enough fields in line '{:s}' of {:s}. Found {:d} fields, want positions {:d} and {:d}",
+						line, fname, pos, (*fit).position, (*fit).secondary_position));
 
 				if ( fail_on_invalid_lines )
 					{
@@ -398,7 +401,7 @@ bool Ascii::DoUpdate()
 
 			if ( val == 0 )
 				{
-				Warning(Fmt("Could not convert line '%s' of %s to Val. Ignoring line.", line.c_str(), fname.c_str()));
+				Warning(Fmt2("Could not convert line '{:s}' of {:s} to Val. Ignoring line.", line, fname));
 				error = true;
 				break;
 				}
@@ -407,7 +410,7 @@ bool Ascii::DoUpdate()
 				{
 				// we have a port definition :)
 				assert(val->type == TYPE_PORT );
-				//	Error(Fmt("Got type %d != PORT with secondary position!", val->type));
+				//	Error(Fmt2("Got type {:d} != PORT with secondary position!", val->type));
 
 				val->val.port_val.proto = formatter->ParseProto(stringfields[(*fit).secondary_position]);
 				}
@@ -468,4 +471,3 @@ bool Ascii::DoHeartbeat(double network_time, double current_time)
 
 	return true;
 	}
-
