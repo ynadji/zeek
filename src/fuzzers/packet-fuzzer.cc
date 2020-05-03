@@ -21,6 +21,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 	if ( ! fb.Valid() )
 		return 0;
 
+	terminating = false;
 	for ( ; ;  )
 		{
 		auto chunk = fb.Next();
@@ -45,6 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 		mgr.Drain();
 		}
 
+	terminating = true;
 	zeek::fuzz_cleanup_one_input();
 	return 0;
 	}
