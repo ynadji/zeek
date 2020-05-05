@@ -1,14 +1,13 @@
 // See the file "COPYING" in the main distribution directory for copyright.
 
-#ifndef ANALYZER_COMPONENT_H
-#define ANALYZER_COMPONENT_H
+#pragma once
 
+#include "../zeek-config.h"
 #include "Tag.h"
 
 #include "plugin/Component.h"
 #include "plugin/TaggedComponent.h"
 
-#include "../zeek-config.h"
 #include "../util.h"
 
 namespace llanalyzer {
@@ -21,7 +20,7 @@ public:
 	typedef Analyzer* (*factory_callback)();
 
 	Component(const std::string& name, factory_callback factory, Tag::subtype_t subtype = 0, bool enabled = true);
-	~Component() override;
+	~Component() override = default;
 
 	/**
 	 * Initialization function. This function has to be called before any
@@ -33,17 +32,13 @@ public:
 	/**
 	 * Returns the analyzer's factory function.
 	 */
-	factory_callback Factory() const {
-	    return factory;
-	}
+	factory_callback Factory() const { return factory; }
 
 	/**
 	 * Returns true if the analyzer is currently enabled and hence
 	 * available for use.
 	 */
-	bool Enabled() const {
-	    return enabled;
-	}
+	bool Enabled() const { return enabled; }
 
 	/**
 	 * Enables or disables this analyzer.
@@ -51,9 +46,7 @@ public:
 	 * @param arg_enabled True to enabled, false to disable.
 	 *
 	 */
-	void SetEnabled(bool arg_enabled) {
-	    enabled = arg_enabled;
-	}
+	void SetEnabled(bool arg_enabled) { enabled = arg_enabled; }
 
 protected:
 	/**
@@ -67,5 +60,3 @@ private:
 };
 
 }
-
-#endif

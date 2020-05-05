@@ -1,13 +1,10 @@
-
-#ifndef BRO_PLUGIN_DEMO_FOO
-#define BRO_PLUGIN_DEMO_FOO
+#pragma once
 
 #include <plugin/Plugin.h>
 
 namespace plugin::LLPOC {
 
-class Plugin : public ::plugin::Plugin
-{
+class Plugin : public ::plugin::Plugin {
 protected:
 	// Overridden from plugin::Plugin.
 	plugin::Configuration Configure() override;
@@ -16,5 +13,3 @@ protected:
 extern Plugin plugin;
 
 }
-
-#endif

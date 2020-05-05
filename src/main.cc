@@ -610,7 +610,6 @@ int main(int argc, char** argv)
 
 	plugin_mgr->InitPreScript();
 	analyzer_mgr->InitPreScript();
-	llanalyzer_mgr->InitPreScript();
 	file_mgr->InitPreScript();
 	zeekygen_mgr->InitPreScript();
 

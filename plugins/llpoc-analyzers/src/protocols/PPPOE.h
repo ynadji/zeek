@@ -7,18 +7,19 @@ namespace plugin::Demo_Foo {
 
 class PPPOE : public llanalyzer::Analyzer {
 public:
-    PPPOE();
-    ~PPPOE() override;
+	PPPOE() : llanalyzer::Analyzer("PPPOE") {}
+	~PPPOE() override = default;
 
-    uint32_t getIdentifier(Packet* packet) override;
-    void analyze(Packet* packet) override;
+	uint32_t getIdentifier(Packet* packet) override;
+	void analyze(Packet* packet) override;
 
-    static llanalyzer::Analyzer* Instantiate() {
-        return new PPPOE();
-    }
+	static llanalyzer::Analyzer* Instantiate()
+		{
+		return new PPPOE();
+		}
 
 private:
-    uint16_t protocol;
+	uint16_t protocol = 0;
 };
 
 } // end of namespace plugin::Demo_Foo

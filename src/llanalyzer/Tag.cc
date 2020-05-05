@@ -6,14 +6,17 @@
 llanalyzer::Tag llanalyzer::Tag::Error;
 
 llanalyzer::Tag::Tag(type_t type, subtype_t subtype)
-        : ::Tag(llanalyzer_mgr->GetTagEnumType(), type, subtype) {
-}
+	: ::Tag(llanalyzer_mgr->GetTagEnumType(), type, subtype)
+	{
+	}
 
-llanalyzer::Tag &llanalyzer::Tag::operator=(const llanalyzer::Tag &other) {
-    ::Tag::operator=(other);
-    return *this;
-}
+llanalyzer::Tag& llanalyzer::Tag::operator=(const llanalyzer::Tag& other)
+	{
+	::Tag::operator=(other);
+	return *this;
+	}
 
-EnumVal* llanalyzer::Tag::AsEnumVal() const {
-    return ::Tag::AsEnumVal(llanalyzer_mgr->GetTagEnumType());
-}
+EnumVal* llanalyzer::Tag::AsEnumVal() const
+	{
+	return ::Tag::AsEnumVal(llanalyzer_mgr->GetTagEnumType());
+	}

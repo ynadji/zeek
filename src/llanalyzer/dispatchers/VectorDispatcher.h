@@ -28,9 +28,10 @@ private:
 
     void freeValues();
 
-    inline identifier_t getHighestIdentifier() const {
-        return lowestIdentifier + table.size() - 1;
-    }
+    inline identifier_t getHighestIdentifier() const
+		{
+		return lowestIdentifier + table.size() - 1;
+		}
 };
 
 }

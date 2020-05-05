@@ -7,15 +7,16 @@ namespace plugin::Demo_Foo {
 
 class ICMP : public llanalyzer::Analyzer {
 public:
-    ICMP();
-    ~ICMP() override;
+	ICMP() : llanalyzer::Analyzer("ICMP") {}
+	~ICMP() override = default;
 
-    uint32_t getIdentifier(Packet* packet) override;
+	uint32_t getIdentifier(Packet* packet) override;
     void analyze(Packet* packet) override;
 
-    static llanalyzer::Analyzer* Instantiate() {
-        return new ICMP();
-    }
+    static llanalyzer::Analyzer* Instantiate()
+		{
+		return new ICMP();
+		}
 };
 
 } // end of namespace plugin::Demo_Foo

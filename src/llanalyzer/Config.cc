@@ -1,63 +1,68 @@
 #include "Config.h"
 #include "Reporter.h"
 
-namespace llanalyzer {
-    const std::string& DispatcherConfig::getName() const {
-        return name;
-    }
+using namespace llanalyzer;
 
-    const std::map<identifier_t, std::string>& DispatcherConfig::getMappings() const {
-        return mappings;
-    }
+const std::string& DispatcherConfig::getName() const
+	{
+	return name;
+	}
 
-    void DispatcherConfig::addMapping(identifier_t identifier, const std::string& analyzerName) {
-        if (mappings.count(identifier)) {
-            reporter->InternalError("Invalid config, identifier %x does already exist for dispatcher set %s.", identifier, name.c_str());
-        }
+const std::map<identifier_t, std::string>& DispatcherConfig::getMappings() const
+	{
+	return mappings;
+	}
 
-        mappings.emplace(identifier, analyzerName);
-    }
+void DispatcherConfig::addMapping(identifier_t identifier, const std::string& analyzerName)
+	{
+	if ( mappings.count(identifier) )
+		reporter->InternalError("Invalid config, identifier %x does already exist for dispatcher set %s.", identifier, name.c_str());
 
-    bool DispatcherConfig::operator==(const DispatcherConfig &rhs) const {
-        return name == rhs.name;
-    }
+	mappings.emplace(identifier, analyzerName);
+	}
 
-    bool DispatcherConfig::operator!=(const DispatcherConfig &rhs) const {
-        return !(rhs == *this);
-    }
+bool DispatcherConfig::operator==(const DispatcherConfig& rhs) const
+	{
+	return name == rhs.name;
+	}
 
-    // ##############################
-    // ########### Config ###########
-    // ##############################
-    std::optional<std::reference_wrapper<DispatcherConfig>> Config::getDispatcherConfig(const std::string& name) {
-        auto it = std::find_if(dispatchers.begin(), dispatchers.end(), [&](const DispatcherConfig& conf) {
-            return conf.getName() == name;
-        });
+bool DispatcherConfig::operator!=(const DispatcherConfig& rhs) const
+	{
+	return ! (rhs == *this);
+	}
 
-        if (it == dispatchers.end()) {
-            return {};
-        } else {
-            return {std::ref(*it)};
-        }
-    }
+// ##############################
+// ########### Config ###########
+// ##############################
+std::optional<std::reference_wrapper<DispatcherConfig>> Config::getDispatcherConfig(const std::string& name)
+	{
+	auto it = std::find_if(dispatchers.begin(), dispatchers.end(), [&](const DispatcherConfig& conf) {
+		return conf.getName() == name;
+	});
 
-    const std::vector<DispatcherConfig>& Config::getDispatchers() const{
-        return dispatchers;
-    }
+	if ( it == dispatchers.end() )
+		return {};
 
-    DispatcherConfig& Config::addDispatcherConfig(const std::string& name) {
-        return dispatchers.emplace_back(name);
-    }
+	return {std::ref(*it)};
+	}
 
-    void Config::addMapping(const std::string& name, identifier_t identifier, const std::string& analyzerName) {
-        // Create dispatcher config if it does not exist yet
-        std::optional<std::reference_wrapper<DispatcherConfig>> dispatcherConfig = getDispatcherConfig(name);
+const std::vector<DispatcherConfig>& Config::getDispatchers() const
+	{
+	return dispatchers;
+	}
 
-        if (!dispatcherConfig) {
-            addDispatcherConfig(name).addMapping(identifier, analyzerName);
-        } else {
-            dispatcherConfig->get().addMapping(identifier, analyzerName);
-        }
+DispatcherConfig& Config::addDispatcherConfig(const std::string& name)
+	{
+	return dispatchers.emplace_back(name);
+	}
 
-    }
-}
+void Config::addMapping(const std::string& name, identifier_t identifier, const std::string& analyzerName)
+	{
+	// Create dispatcher config if it does not exist yet
+	std::optional<std::reference_wrapper<DispatcherConfig>> dispatcherConfig = getDispatcherConfig(name);
+
+	if ( ! dispatcherConfig )
+		addDispatcherConfig(name).addMapping(identifier, analyzerName);
+	else
+		dispatcherConfig->get().addMapping(identifier, analyzerName);
+	}

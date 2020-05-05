@@ -23,14 +23,15 @@ private:
 
     void _clear();
 
-    inline bool containsBucketCollision() {
-        for (size_t bucket = 0; bucket < table.bucket_count(); bucket++) {
-            if (table.bucket_size(bucket) > 1) {
-                return true;
-            }
-        }
-        return false;
-    }
+    inline bool containsBucketCollision()
+		{
+		for ( size_t bucket = 0; bucket < table.bucket_count(); bucket++ )
+			{
+			if ( table.bucket_size(bucket) > 1 )
+				return true;
+			}
+		return false;
+		}
 };
 
 }

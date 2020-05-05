@@ -12,8 +12,7 @@ namespace llanalyzer {
 
 class DispatcherConfig {
 public:
-    explicit DispatcherConfig(const std::string name) : name(std::move(name)) {
-    }
+	explicit DispatcherConfig(const std::string name) : name(std::move(name)) { }
 
     const std::string& getName() const;
     const std::map<identifier_t, std::string>& getMappings() const;

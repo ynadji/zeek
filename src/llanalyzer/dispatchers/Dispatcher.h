@@ -17,8 +17,7 @@ public:
     Analyzer* analyzer;
     Dispatcher* dispatcher;
 
-    Value(Analyzer* analyzer, Dispatcher* dispatcher) : analyzer(analyzer), dispatcher(dispatcher) {
-    }
+	Value(Analyzer* analyzer, Dispatcher* dispatcher) : analyzer(analyzer), dispatcher(dispatcher) { }
 };
 
 class Dispatcher {
@@ -26,11 +25,11 @@ public:
     virtual ~Dispatcher() = default;
 
     virtual bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) = 0;
-    virtual void Register(const register_map& data) {
-        for (auto& current : data) {
-            Register(current.first, current.second.first, current.second.second);
-        }
-    }
+    virtual void Register(const register_map& data)
+		{
+        for (auto& current : data)
+	        Register(current.first, current.second.first, current.second.second);
+		}
 
     virtual const Value* Lookup(identifier_t identifier) const = 0;
 

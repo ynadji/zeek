@@ -64,38 +64,44 @@ private:
      */
     bool findCollisionFreeHashFunction(const std::vector<pair_t>& intermediate);
 
-    [[nodiscard]] inline uint64_t hash(const uint64_t value) const {
-        return (a * value + b) >> wMinusM;
-    }
+    [[nodiscard]] inline uint64_t hash(const uint64_t value) const
+		{
+		return (a * value + b) >> wMinusM;
+		}
 
-    inline void randomizeAB() {
-        do {
-            a = distributionA(generator);
-        } while (a % 2 == 0);
+    inline void randomizeAB()
+		{
+		do
+			{
+			a = distributionA(generator);
+			} while ( a % 2 == 0 );
 
         b = distributionB(generator);
     }
 
-    inline void setBins(uint64_t newM) {
-        if (newM > (sizeof(uint64_t) * 8)) {
+    inline void setBins(uint64_t newM)
+		{
+        if ( newM > (sizeof(uint64_t) * 8) )
             throw std::runtime_error("Number of bits for bin count too large.");
-        }
 
         M = newM;
         wMinusM = sizeof(uint64_t) * 8 - M;
         distributionB = std::uniform_int_distribution<uint64_t>(0, ((uint64_t)(1u) << wMinusM) - (uint64_t)(1u));
-    }
+		}
 
-    inline std::vector<pair_t> createIntermediate() {
+    inline std::vector<pair_t> createIntermediate()
+		{
         std::vector<pair_t> intermediate;
-        for (const auto &current : table) {
-            if (current.second != nullptr) {
-                assert(current.second->analyzer != nullptr);
-                intermediate.emplace_back(current.first, current.second);
-            }
-        }
+        for ( const auto &current : table )
+	        {
+	        if ( current.second != nullptr )
+		        {
+		        assert(current.second->analyzer != nullptr);
+		        intermediate.emplace_back(current.first, current.second);
+		        }
+	        }
         return intermediate;
-    }
+		}
 };
 
 }

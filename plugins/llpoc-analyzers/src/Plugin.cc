@@ -1,4 +1,3 @@
-
 #include "Plugin.h"
 
 #include "protocols/Ethernet.h"
@@ -13,7 +12,8 @@ namespace plugin::LLPOC {
 
 Plugin plugin;
 
-plugin::Configuration Plugin::Configure() {
+plugin::Configuration Plugin::Configure()
+	{
     AddComponent(new ::llanalyzer::Component("Ethernet", plugin::Demo_Foo::Ethernet::Instantiate));
     AddComponent(new ::llanalyzer::Component("PPPoE", plugin::Demo_Foo::PPPOE::Instantiate));
     AddComponent(new ::llanalyzer::Component("ARP", plugin::Demo_Foo::ARP::Instantiate));
@@ -29,6 +29,5 @@ plugin::Configuration Plugin::Configure() {
     config.version.minor = 0;
     config.version.patch = 0;
     return config;
-}
-
+	}
 }

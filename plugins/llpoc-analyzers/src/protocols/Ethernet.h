@@ -7,19 +7,20 @@ namespace plugin::Demo_Foo {
 
 class Ethernet : public llanalyzer::Analyzer {
 public:
-    Ethernet();
-    ~Ethernet() override;
+	Ethernet();
+	~Ethernet() override = default;
 
-    uint32_t getIdentifier(Packet* packet) override;
-    void analyze(Packet* packet) override;
+	uint32_t getIdentifier(Packet* packet) override;
+	void analyze(Packet* packet) override;
 
-    static llanalyzer::Analyzer* Instantiate() {
-        return new Ethernet();
-    }
+	static llanalyzer::Analyzer* Instantiate()
+		{
+		return new Ethernet();
+		}
 
 private:
-    uint16_t protocol;
-    Packet* currentPacket;
+	uint16_t protocol;
+	Packet* currentPacket;
 };
 
 } // end of namespace plugin::Demo_Foo

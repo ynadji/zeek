@@ -7,15 +7,16 @@ namespace plugin::Demo_Foo {
 
 class ARP : public llanalyzer::Analyzer {
 public:
-    ARP();
-    ~ARP() override;
+	ARP() : llanalyzer::Analyzer("ARP") {}
+	~ARP() override = default
 
-    uint32_t getIdentifier(Packet* packet) override;
-    void analyze(Packet* packet) override;
+	uint32_t getIdentifier(Packet* packet) override;
+	void analyze(Packet* packet) override;
 
-    static llanalyzer::Analyzer* Instantiate() {
-        return new ARP();
-    }
+    static llanalyzer::Analyzer* Instantiate()
+		{
+		return new ARP();
+		}
 };
 
-} // end of namespace plugin::Demo_Foo
+}

@@ -30,7 +30,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~Analyzer();
+	virtual ~Analyzer() = default;
 
 	/**
 	 * Returns the tag associated with the analyzer's type.
