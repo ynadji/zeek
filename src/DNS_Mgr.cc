@@ -285,7 +285,7 @@ IntrusivePtr<ListVal> DNS_Mapping::Addrs()
 		auto addrs_val = make_intrusive<ListVal>(TYPE_ADDR);
 
 		for ( int i = 0; i < num_addrs; ++i )
-			addrs_val->Append(new AddrVal(addrs[i]));
+			addrs_val->Append(make_intrusive<AddrVal>(addrs[i]));
 		}
 
 	return addrs_val;
@@ -479,7 +479,7 @@ static IntrusivePtr<TableVal> fake_name_lookup_result(const char* name)
 	internal_md5(reinterpret_cast<const u_char*>(name), strlen(name),
 	    reinterpret_cast<u_char*>(hash));
 	auto hv = make_intrusive<ListVal>(TYPE_ADDR);
-	hv->Append(new AddrVal(hash));
+	hv->Append(make_intrusive<AddrVal>(hash));
 	return hv->ToSetVal();
 	}
 
@@ -901,7 +901,7 @@ IntrusivePtr<ListVal> DNS_Mgr::AddrListDelta(ListVal* al1, ListVal* al2)
 
 		if ( j >= al2->Length() )
 			// Didn't find it.
-			delta->Append(al1->Index(i)->Ref());
+			delta->Append({NewRef{}, al1->Index(i)});
 		}
 
 	return delta;
