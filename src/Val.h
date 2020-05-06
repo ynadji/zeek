@@ -999,6 +999,9 @@ protected:
 	friend class Val;
 	friend class EnumType;
 
+	template<class T, class... Ts>
+	friend IntrusivePtr<T> make_intrusive(Ts&&... args);
+
 	EnumVal(EnumType* t, int i) : Val(bro_int_t(i), t)
 		{
 		}
