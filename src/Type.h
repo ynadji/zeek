@@ -788,7 +788,7 @@ inline bool IsRecord(TypeTag t)	{ return (t == TYPE_RECORD || t == TYPE_UNION); 
 inline bool IsFunc(TypeTag t)	{ return (t == TYPE_FUNC); }
 
 // True if the given type type is a vector.
-inline bool IsVector(TypeTag t)	{ return (t == TYPE_VECTOR); }
+inline bool IsAVector(TypeTag t)	{ return (t == TYPE_VECTOR); }
 
 // True if the given type type is a string.
 inline bool IsString(TypeTag t)	{ return (t == TYPE_STRING); }
