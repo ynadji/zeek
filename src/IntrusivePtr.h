@@ -191,7 +191,7 @@ IntrusivePtr<T> make_intrusive(Ts&&... args)
  * @return  The pointer, as cast to type @c T.
  */
 template <class T, class U>
-IntrusivePtr<T> cast_intrusive(IntrusivePtr<U>&& p) noexcept
+IntrusivePtr<T> cast_intrusive(IntrusivePtr<U> p) noexcept
 	{
 	return {AdoptRef{}, static_cast<T*>(p.release())};
 	}
