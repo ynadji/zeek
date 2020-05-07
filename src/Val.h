@@ -629,7 +629,6 @@ public:
 
 	int Length() const		{ return vals.size(); }
 
-	IntrusivePtr<Val>& Idx(size_t i)	{ return vals[i]; }
 	const IntrusivePtr<Val>& Idx(size_t i) const	{ return vals[i]; }
 
 	[[deprecated("Remove in v4.1.  Use Idx() instead")]]
