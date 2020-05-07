@@ -121,7 +121,7 @@ bool is_export = false; // true if in an export {} block
  * When parsing an expression for the debugger, where to put the result
  * (obviously not reentrant).
  */
-extern Expr* g_curr_debug_expr;
+extern zeek::detail::Expr* g_curr_debug_expr;
 extern bool in_debug;
 extern const char* g_curr_debug_error;
 
@@ -224,9 +224,9 @@ static void extend_record(ID* id, type_decl_list* fields, attr_list* attrs)
 		}
 	}
 
-static bool expr_is_table_type_name(const Expr* expr)
+static bool expr_is_table_type_name(const zeek::detail::Expr* expr)
 	{
-	if ( expr->Tag() != EXPR_NAME )
+	if ( expr->Tag() != zeek::detail::EXPR_NAME )
 		return false;
 
 	BroType* type = expr->Type();
@@ -249,10 +249,10 @@ static bool expr_is_table_type_name(const Expr* expr)
 	init_class ic;
 	Val* val;
 	RE_Matcher* re;
-	Expr* expr;
-	EventExpr* event_expr;
+	zeek::detail::Expr* expr;
+	zeek::detail::EventExpr* event_expr;
 	zeek::detail::Stmt* stmt;
-	ListExpr* list;
+	zeek::detail::ListExpr* list;
 	BroType* type;
 	RecordType* record;
 	FuncType* func_type;
@@ -312,169 +312,169 @@ expr:
 	|	TOK_COPY '(' expr ')'
 			{
 			set_location(@1, @4);
-			$$ = new CloneExpr({AdoptRef{}, $3});
+			$$ = new zeek::detail::CloneExpr({AdoptRef{}, $3});
 			}
 
 	|	TOK_INCR expr
 			{
 			set_location(@1, @2);
-			$$ = new IncrExpr(EXPR_INCR, {AdoptRef{}, $2});
+			$$ = new zeek::detail::IncrExpr(zeek::detail::EXPR_INCR, {AdoptRef{}, $2});
 			}
 
 	|	TOK_DECR expr
 			{
 			set_location(@1, @2);
-			$$ = new IncrExpr(EXPR_DECR, {AdoptRef{}, $2});
+			$$ = new zeek::detail::IncrExpr(zeek::detail::EXPR_DECR, {AdoptRef{}, $2});
 			}
 
 	|	'!' expr
 			{
 			set_location(@1, @2);
-			$$ = new NotExpr({AdoptRef{}, $2});
+			$$ = new zeek::detail::NotExpr({AdoptRef{}, $2});
 			}
 
 	|	'~' expr
 			{
 			set_location(@1, @2);
-			$$ = new ComplementExpr({AdoptRef{}, $2});
+			$$ = new zeek::detail::ComplementExpr({AdoptRef{}, $2});
 			}
 
 	|	'-' expr	%prec '!'
 			{
 			set_location(@1, @2);
-			$$ = new NegExpr({AdoptRef{}, $2});
+			$$ = new zeek::detail::NegExpr({AdoptRef{}, $2});
 			}
 
 	|	'+' expr	%prec '!'
 			{
 			set_location(@1, @2);
-			$$ = new PosExpr({AdoptRef{}, $2});
+			$$ = new zeek::detail::PosExpr({AdoptRef{}, $2});
 			}
 
 	|	expr '+' expr
 			{
 			set_location(@1, @3);
-			$$ = new AddExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::AddExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_ADD_TO expr
 			{
 			set_location(@1, @3);
-			$$ = new AddToExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::AddToExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '-' expr
 			{
 			set_location(@1, @3);
-			$$ = new SubExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::SubExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_REMOVE_FROM expr
 			{
 			set_location(@1, @3);
-			$$ = new RemoveFromExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::RemoveFromExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '*' expr
 			{
 			set_location(@1, @3);
-			$$ = new TimesExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::TimesExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '/' expr
 			{
 			set_location(@1, @3);
-			$$ = new DivideExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::DivideExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '%' expr
 			{
 			set_location(@1, @3);
-			$$ = new ModExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::ModExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '&' expr
 			{
 			set_location(@1, @3);
-			$$ = new BitExpr(EXPR_AND, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::BitExpr(zeek::detail::EXPR_AND, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '|' expr
 			{
 			set_location(@1, @3);
-			$$ = new BitExpr(EXPR_OR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::BitExpr(zeek::detail::EXPR_OR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '^' expr
 			{
 			set_location(@1, @3);
-			$$ = new BitExpr(EXPR_XOR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::BitExpr(zeek::detail::EXPR_XOR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_AND_AND expr
 			{
 			set_location(@1, @3);
-			$$ = new BoolExpr(EXPR_AND_AND, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::BoolExpr(zeek::detail::EXPR_AND_AND, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_OR_OR expr
 			{
 			set_location(@1, @3);
-			$$ = new BoolExpr(EXPR_OR_OR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::BoolExpr(zeek::detail::EXPR_OR_OR, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_EQ expr
 			{
 			set_location(@1, @3);
-			$$ = new EqExpr(EXPR_EQ, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::EqExpr(zeek::detail::EXPR_EQ, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_NE expr
 			{
 			set_location(@1, @3);
-			$$ = new EqExpr(EXPR_NE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::EqExpr(zeek::detail::EXPR_NE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '<' expr
 			{
 			set_location(@1, @3);
-			$$ = new RelExpr(EXPR_LT, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::RelExpr(zeek::detail::EXPR_LT, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_LE expr
 			{
 			set_location(@1, @3);
-			$$ = new RelExpr(EXPR_LE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::RelExpr(zeek::detail::EXPR_LE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '>' expr
 			{
 			set_location(@1, @3);
-			$$ = new RelExpr(EXPR_GT, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::RelExpr(zeek::detail::EXPR_GT, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_GE expr
 			{
 			set_location(@1, @3);
-			$$ = new RelExpr(EXPR_GE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::RelExpr(zeek::detail::EXPR_GE, {AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr '?' expr ':' expr
 			{
 			set_location(@1, @5);
-			$$ = new CondExpr({AdoptRef{}, $1}, {AdoptRef{}, $3}, {AdoptRef{}, $5});
+			$$ = new zeek::detail::CondExpr({AdoptRef{}, $1}, {AdoptRef{}, $3}, {AdoptRef{}, $5});
 			}
 
 	|	expr '=' expr
 			{
 			set_location(@1, @3);
 
-			if ( $1->Tag() == EXPR_INDEX && $1->AsIndexExpr()->IsSlice() )
+			if ( $1->Tag() == zeek::detail::EXPR_INDEX && $1->AsIndexExpr()->IsSlice() )
 				reporter->Error("index slice assignment may not be used"
 				                " in arbitrary expression contexts, only"
 				                " as a statement");
 
-			$$ = get_assign_expr({AdoptRef{}, $1}, {AdoptRef{}, $3}, in_init).release();
+			$$ = zeek::detail::get_assign_expr({AdoptRef{}, $1}, {AdoptRef{}, $3}, in_init).release();
 			}
 
 	|	TOK_LOCAL local_id '=' expr
@@ -487,7 +487,7 @@ expr:
 	|	expr '[' expr_list ']'
 			{
 			set_location(@1, @4);
-			$$ = new IndexExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::IndexExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	index_slice
@@ -495,13 +495,13 @@ expr:
 	|	expr '$' TOK_ID
 			{
 			set_location(@1, @3);
-			$$ = new FieldExpr({AdoptRef{}, $1}, $3);
+			$$ = new zeek::detail::FieldExpr({AdoptRef{}, $1}, $3);
 			}
 
 	|	'$' TOK_ID '=' expr
 			{
 			set_location(@1, @4);
-			$$ = new FieldAssignExpr($2, {AdoptRef{}, $4});
+			$$ = new zeek::detail::FieldAssignExpr($2, {AdoptRef{}, $4});
 			}
 
 	|	'$' TOK_ID func_params '='
@@ -514,22 +514,22 @@ expr:
 			}
 		 lambda_body
 			{
-			$$ = new FieldAssignExpr($2, IntrusivePtr{AdoptRef{}, $6});
+			$$ = new zeek::detail::FieldAssignExpr($2, IntrusivePtr{AdoptRef{}, $6});
 			Unref(func_id);
 			}
 
 	|	expr TOK_IN expr
 			{
 			set_location(@1, @3);
-			$$ = new InExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::InExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|	expr TOK_NOT_IN expr
 			{
 			set_location(@1, @3);
-			$$ = new NotExpr(make_intrusive<InExpr>(
-			        IntrusivePtr<Expr>{AdoptRef{}, $1},
-			        IntrusivePtr<Expr>{AdoptRef{}, $3}));
+			$$ = new zeek::detail::NotExpr(make_intrusive<zeek::detail::InExpr>(
+			        IntrusivePtr<zeek::detail::Expr>{AdoptRef{}, $1},
+			        IntrusivePtr<zeek::detail::Expr>{AdoptRef{}, $3}));
 			}
 
 	|	'[' expr_list ']'
@@ -544,7 +544,7 @@ expr:
 
 			for ( int i = 0; i < $2->Exprs().length(); ++i )
 				{
-				if ( $2->Exprs()[i]->Tag() != EXPR_FIELD_ASSIGN )
+				if ( $2->Exprs()[i]->Tag() != zeek::detail::EXPR_FIELD_ASSIGN )
 					{
 					is_record_ctor = false;
 					break;
@@ -552,7 +552,7 @@ expr:
 				}
 
 			if ( is_record_ctor )
-				$$ = new RecordConstructorExpr({AdoptRef{}, $2});
+				$$ = new zeek::detail::RecordConstructorExpr({AdoptRef{}, $2});
 			else
 				$$ = $2;
 			}
@@ -560,33 +560,33 @@ expr:
 	|	'[' ']'
 			{
 			// We interpret this as an empty record constructor.
-			$$ = new RecordConstructorExpr(make_intrusive<ListExpr>());
+			$$ = new zeek::detail::RecordConstructorExpr(make_intrusive<zeek::detail::ListExpr>());
 			}
 
 
 	|	TOK_RECORD '(' expr_list ')'
 			{
 			set_location(@1, @4);
-			$$ = new RecordConstructorExpr({AdoptRef{}, $3});
+			$$ = new zeek::detail::RecordConstructorExpr({AdoptRef{}, $3});
 			}
 
 	|	TOK_TABLE '(' { ++in_init; } opt_expr_list ')' { --in_init; }
 		opt_attr
 			{ // the ++in_init fixes up the parsing of "[x] = y"
 			set_location(@1, @5);
-			$$ = new TableConstructorExpr({AdoptRef{}, $4}, $7);
+			$$ = new zeek::detail::TableConstructorExpr({AdoptRef{}, $4}, $7);
 			}
 
 	|	TOK_SET '(' opt_expr_list ')' opt_attr
 			{
 			set_location(@1, @4);
-			$$ = new SetConstructorExpr({AdoptRef{}, $3}, $5);
+			$$ = new zeek::detail::SetConstructorExpr({AdoptRef{}, $3}, $5);
 			}
 
 	|	TOK_VECTOR '(' opt_expr_list ')'
 			{
 			set_location(@1, @4);
-			$$ = new VectorConstructorExpr({AdoptRef{}, $3});
+			$$ = new zeek::detail::VectorConstructorExpr({AdoptRef{}, $3});
 			}
 
 	|	expr '('
@@ -607,32 +607,32 @@ expr:
 
 			BroType* ctor_type = 0;
 
-			if ( $1->Tag() == EXPR_NAME &&
+			if ( $1->Tag() == zeek::detail::EXPR_NAME &&
 			     (ctor_type = $1->AsNameExpr()->Id()->AsType()) )
 				{
 				switch ( ctor_type->Tag() ) {
 				case TYPE_RECORD:
 					{
-					auto rce = make_intrusive<RecordConstructorExpr>(
-					            IntrusivePtr<ListExpr>{AdoptRef{}, $4});
+					auto rce = make_intrusive<zeek::detail::RecordConstructorExpr>(
+					            IntrusivePtr<zeek::detail::ListExpr>{AdoptRef{}, $4});
 					IntrusivePtr<RecordType> rt{NewRef{}, ctor_type->AsRecordType()};
-					$$ = new RecordCoerceExpr(std::move(rce), std::move(rt));
+					$$ = new zeek::detail::RecordCoerceExpr(std::move(rce), std::move(rt));
 					}
 					break;
 
 				case TYPE_TABLE:
 					if ( ctor_type->IsTable() )
-						$$ = new TableConstructorExpr({AdoptRef{}, $4}, 0,
-						                              {NewRef{}, ctor_type});
+						$$ = new zeek::detail::TableConstructorExpr({AdoptRef{}, $4}, 0,
+						                                            {NewRef{}, ctor_type});
 					else
-						$$ = new SetConstructorExpr({AdoptRef{}, $4}, 0,
-						                            {NewRef{}, ctor_type});
+						$$ = new zeek::detail::SetConstructorExpr({AdoptRef{}, $4}, 0,
+						                                          {NewRef{}, ctor_type});
 
 					break;
 
 				case TYPE_VECTOR:
-					$$ = new VectorConstructorExpr({AdoptRef{}, $4},
-					                               {NewRef{}, ctor_type});
+					$$ = new zeek::detail::VectorConstructorExpr({AdoptRef{}, $4},
+					                                             {NewRef{}, ctor_type});
 					break;
 
 				default:
@@ -642,14 +642,14 @@ expr:
 				}
 
 			else
-				$$ = new CallExpr({AdoptRef{}, $1}, {AdoptRef{}, $4}, in_hook > 0);
+				$$ = new zeek::detail::CallExpr({AdoptRef{}, $1}, {AdoptRef{}, $4}, in_hook > 0);
 			}
 
 	|	TOK_HOOK { ++in_hook; } expr
 			{
 			--in_hook;
 			set_location(@1, @3);
-			if ( $3->Tag() != EXPR_CALL )
+			if ( $3->Tag() != zeek::detail::EXPR_CALL )
 				$3->Error("not a valid hook call expression");
 			$$ = $3;
 			}
@@ -657,7 +657,7 @@ expr:
 	|	expr TOK_HAS_FIELD TOK_ID
 			{
 			set_location(@1, @3);
-			$$ = new HasFieldExpr({AdoptRef{}, $1}, $3);
+			$$ = new zeek::detail::HasFieldExpr({AdoptRef{}, $1}, $3);
 			}
 
 	|	anonymous_function
@@ -666,7 +666,7 @@ expr:
 	|	TOK_SCHEDULE expr '{' event '}'
 			{
 			set_location(@1, @5);
-			$$ = new ScheduleExpr({AdoptRef{}, $2}, {AdoptRef{}, $4});
+			$$ = new zeek::detail::ScheduleExpr({AdoptRef{}, $2}, {AdoptRef{}, $4});
 			}
 
 	|	TOK_ID
@@ -701,7 +701,7 @@ expr:
 					{
 					id->Error("undeclared variable");
 					id->SetType(error_type());
-					$$ = new NameExpr(std::move(id));
+					$$ = new zeek::detail::NameExpr(std::move(id));
 					}
 
 				else if ( id->IsEnumConst() )
@@ -711,11 +711,11 @@ expr:
 							       id->Name());
 					if ( intval < 0 )
 						reporter->InternalError("enum value not found for %s", id->Name());
-					$$ = new ConstExpr(t->GetVal(intval));
+					$$ = new zeek::detail::ConstExpr(t->GetVal(intval));
 					}
 				else
 					{
-					$$ = new NameExpr(std::move(id));
+					$$ = new zeek::detail::NameExpr(std::move(id));
 					}
 				}
 			}
@@ -723,7 +723,7 @@ expr:
 	|	TOK_CONSTANT
 			{
 			set_location(@1);
-			$$ = new ConstExpr({AdoptRef{}, $1});
+			$$ = new zeek::detail::ConstExpr({AdoptRef{}, $1});
 			}
 
 	|	'/' { begin_RE(); } TOK_PATTERN_TEXT TOK_PATTERN_END
@@ -737,30 +737,30 @@ expr:
 				re->MakeCaseInsensitive();
 
 			re->Compile();
-			$$ = new ConstExpr(make_intrusive<PatternVal>(re));
+			$$ = new zeek::detail::ConstExpr(make_intrusive<PatternVal>(re));
 			}
 
 	|       '|' expr '|'	%prec '('
 			{
 			set_location(@1, @3);
-			IntrusivePtr<Expr> e{AdoptRef{}, $2};
+			IntrusivePtr<zeek::detail::Expr> e{AdoptRef{}, $2};
 
 			if ( IsIntegral(e->Type()->Tag()) )
-				e = make_intrusive<ArithCoerceExpr>(std::move(e), TYPE_INT);
+				e = make_intrusive<zeek::detail::ArithCoerceExpr>(std::move(e), TYPE_INT);
 
-			$$ = new SizeExpr(std::move(e));
+			$$ = new zeek::detail::SizeExpr(std::move(e));
 			}
 
 	|       expr TOK_AS type
 			{
 			set_location(@1, @3);
-			$$ = new CastExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::CastExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 
 	|       expr TOK_IS type
 			{
 			set_location(@1, @3);
-			$$ = new IsExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
+			$$ = new zeek::detail::IsExpr({AdoptRef{}, $1}, {AdoptRef{}, $3});
 			}
 	;
 
@@ -774,14 +774,14 @@ expr_list:
 	|	expr
 			{
 			set_location(@1);
-			$$ = new ListExpr({AdoptRef{}, $1});
+			$$ = new zeek::detail::ListExpr({AdoptRef{}, $1});
 			}
 	;
 
 opt_expr_list:
 		expr_list
 	|
-		{ $$ = new ListExpr(); }
+		{ $$ = new zeek::detail::ListExpr(); }
 	;
 
 enum_body:
@@ -1115,7 +1115,7 @@ decl:
 	|	TOK_REDEF global_id opt_type init_class opt_init opt_attr ';'
 			{
 			IntrusivePtr id{AdoptRef{}, $2};
-			IntrusivePtr<Expr> init{AdoptRef{}, $5};
+			IntrusivePtr<zeek::detail::Expr> init{AdoptRef{}, $5};
 			add_global(id.get(), {AdoptRef{}, $3}, $4, init, $6, VAR_REDEF);
 			zeekygen_mgr->Redef(id.get(), ::filename, $4, std::move(init));
 			}
@@ -1260,7 +1260,7 @@ lambda_body:
 			auto ingredients = std::make_unique<function_ingredients>(IntrusivePtr{NewRef{}, current_scope()}, IntrusivePtr{AdoptRef{}, $3});
 			id_list outer_ids = gather_outer_ids(pop_scope().get(), ingredients->body.get());
 
-			$$ = new LambdaExpr(std::move(ingredients), std::move(outer_ids));
+			$$ = new zeek::detail::LambdaExpr(std::move(ingredients), std::move(outer_ids));
 			}
 	;
 
@@ -1318,19 +1318,19 @@ index_slice:
 			{
 			set_location(@1, @6);
 
-			auto low = $3 ? IntrusivePtr<Expr>{AdoptRef{}, $3} :
-			                make_intrusive<ConstExpr>(val_mgr->Count(0));
+			auto low = $3 ? IntrusivePtr<zeek::detail::Expr>{AdoptRef{}, $3} :
+			                make_intrusive<zeek::detail::ConstExpr>(val_mgr->Count(0));
 
-			auto high = $5 ? IntrusivePtr<Expr>{AdoptRef{}, $5} :
-			                 make_intrusive<SizeExpr>(
-			                     IntrusivePtr<Expr>{NewRef{}, $1});
+			auto high = $5 ? IntrusivePtr<zeek::detail::Expr>{AdoptRef{}, $5} :
+			                 make_intrusive<zeek::detail::SizeExpr>(
+			                     IntrusivePtr<zeek::detail::Expr>{NewRef{}, $1});
 
 			if ( ! IsIntegral(low->Type()->Tag()) || ! IsIntegral(high->Type()->Tag()) )
 				reporter->Error("slice notation must have integral values as indexes");
 
-			auto le = make_intrusive<ListExpr>(std::move(low));
+			auto le = make_intrusive<zeek::detail::ListExpr>(std::move(low));
 			le->Append(std::move(high));
-			$$ = new IndexExpr({AdoptRef{}, $1}, std::move(le), true);
+			$$ = new zeek::detail::IndexExpr({AdoptRef{}, $1}, std::move(le), true);
 			}
 
 opt_attr:
@@ -1385,7 +1385,7 @@ attr:
 	|	TOK_ATTR_DEPRECATED '=' TOK_CONSTANT
 			{
 			if ( IsString($3->Type()->Tag()) )
-				$$ = new Attr(ATTR_DEPRECATED, make_intrusive<ConstExpr>(IntrusivePtr{AdoptRef{}, $3}));
+				$$ = new Attr(ATTR_DEPRECATED, make_intrusive<zeek::detail::ConstExpr>(IntrusivePtr{AdoptRef{}, $3}));
 			else
 				{
 				ODesc d;
@@ -1561,7 +1561,7 @@ stmt:
 	|	index_slice '=' expr ';' opt_no_test
 			{
 			set_location(@1, @4);
-			$$ = new zeek::detail::ExprStmt(get_assign_expr({AdoptRef{}, $1},
+			$$ = new zeek::detail::ExprStmt(zeek::detail::get_assign_expr({AdoptRef{}, $1},
 			                                  {AdoptRef{}, $3}, in_init));
 
 			if ( ! $5 )
@@ -1615,7 +1615,7 @@ event:
 					reporter->Warning("%s", id->GetDeprecationWarning().c_str());
 				}
 
-			$$ = new EventExpr($1, {AdoptRef{}, $3});
+			$$ = new zeek::detail::EventExpr($1, {AdoptRef{}, $3});
 			}
 	;
 
@@ -1867,19 +1867,19 @@ opt_no_test_block:
 
 opt_deprecated:
 		TOK_ATTR_DEPRECATED
-			{ $$ = new ConstExpr(make_intrusive<StringVal>("")); }
+			{ $$ = new zeek::detail::ConstExpr(make_intrusive<StringVal>("")); }
 	|
 		TOK_ATTR_DEPRECATED '=' TOK_CONSTANT
 			{
 			if ( IsString($3->Type()->Tag()) )
-				$$ = new ConstExpr({AdoptRef{}, $3});
+				$$ = new zeek::detail::ConstExpr({AdoptRef{}, $3});
 			else
 				{
 				ODesc d;
 				$3->Describe(&d);
 				reporter->Error("'&deprecated=%s' must use a string literal",
 				                d.Description());
-				$$ = new ConstExpr(make_intrusive<StringVal>(""));
+				$$ = new zeek::detail::ConstExpr(make_intrusive<StringVal>(""));
 				}
 			}
 	|

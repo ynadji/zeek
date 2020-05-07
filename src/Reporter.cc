@@ -142,7 +142,7 @@ void Reporter::FatalErrorWithCore(const char* fmt, ...)
 	abort();
 	}
 
-void Reporter::ExprRuntimeError(const Expr* expr, const char* fmt, ...)
+void Reporter::ExprRuntimeError(const zeek::detail::Expr* expr, const char* fmt, ...)
 	{
 	++errors;
 

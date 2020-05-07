@@ -14,8 +14,6 @@
 #include "TraverseTypes.h"
 
 class CompositeHash;
-class EventExpr;
-class ListExpr;
 class Frame;
 
 namespace zeek::detail {
@@ -65,6 +63,9 @@ using NullStmt [[deprecated("Remove in v4.1. Use zeek::detail::NullStmt instead.
 using WhenStmt [[deprecated("Remove in v4.1. Use zeek::detail::WhenStmt instead.")]] = zeek::detail::WhenStmt;
 
 namespace zeek::detail {
+
+class EventExpr;
+class ListExpr;
 
 class Stmt : public BroObj {
 public:
