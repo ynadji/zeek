@@ -155,11 +155,11 @@ static void parser_redef_enum (ID *id)
 	/* Redef an enum. id points to the enum to be redefined.
 	   Let cur_enum_type point to it. */
 	assert(cur_enum_type == NULL);
-	if ( ! id->Type() )
+	if ( ! id->GetType() )
 		id->Error("unknown identifier");
 	else
 		{
-		cur_enum_type = id->Type()->AsEnumType();
+		cur_enum_type = id->GetType()->AsEnumType();
 		if ( ! cur_enum_type )
 			id->Error("not an enum");
 		}
@@ -607,31 +607,28 @@ expr:
 
 			if ( $1->Tag() == EXPR_NAME && $1->AsNameExpr()->Id()->IsType() )
 				{
-				auto ctor_type = $1->AsNameExpr()->Id()->Type();
+				const auto& ctor_type = $1->AsNameExpr()->Id()->GetType();
 
 				switch ( ctor_type->Tag() ) {
 				case TYPE_RECORD:
 					{
 					auto rce = make_intrusive<RecordConstructorExpr>(
 					            IntrusivePtr<ListExpr>{AdoptRef{}, $4});
-					IntrusivePtr<RecordType> rt{NewRef{}, ctor_type->AsRecordType()};
+					auto rt = cast_intrusive<RecordType>(ctor_type);
 					$$ = new RecordCoerceExpr(std::move(rce), std::move(rt));
 					}
 					break;
 
 				case TYPE_TABLE:
 					if ( ctor_type->IsTable() )
-						$$ = new TableConstructorExpr({AdoptRef{}, $4}, 0,
-						                              {NewRef{}, ctor_type});
+						$$ = new TableConstructorExpr({AdoptRef{}, $4}, 0, ctor_type);
 					else
-						$$ = new SetConstructorExpr({AdoptRef{}, $4}, 0,
-						                            {NewRef{}, ctor_type});
+						$$ = new SetConstructorExpr({AdoptRef{}, $4}, 0, ctor_type);
 
 					break;
 
 				case TYPE_VECTOR:
-					$$ = new VectorConstructorExpr({AdoptRef{}, $4},
-					                               {NewRef{}, ctor_type});
+					$$ = new VectorConstructorExpr({AdoptRef{}, $4}, ctor_type);
 					break;
 
 				default:
@@ -696,7 +693,7 @@ expr:
 				if ( id->IsDeprecated() )
 					reporter->Warning("%s", id->GetDeprecationWarning().c_str());
 
-				if ( ! id->Type() )
+				if ( ! id->GetType() )
 					{
 					id->Error("undeclared variable");
 					id->SetType(error_type());
@@ -705,7 +702,7 @@ expr:
 
 				else if ( id->IsEnumConst() )
 					{
-					EnumType* t = id->Type()->AsEnumType();
+					EnumType* t = id->GetType()->AsEnumType();
 					int intval = t->Lookup(id->ModuleName(),
 							       id->Name());
 					if ( intval < 0 )
@@ -1005,7 +1002,7 @@ type:
 
 	|	resolve_id
 			{
-			if ( ! $1 || ! ($$ = $1->IsType() ? $1->Type() : nullptr) )
+			if ( ! $1 || ! ($$ = $1->IsType() ? $1->GetType().get() : nullptr) )
 				{
 				NullStmt here;
 				if ( $1 )
@@ -1136,7 +1133,7 @@ decl:
 			{
 			cur_decl_type_id = 0;
 
-			if ( ! $3->Type() )
+			if ( ! $3->GetType() )
 				$3->Error("unknown identifier");
 			else
 				extend_record($3, $8, $11);
@@ -1816,7 +1813,7 @@ global_or_event_id:
 
 				if ( $$->IsDeprecated() )
 					{
-					BroType* t = $$->Type();
+					const auto& t = $$->GetType();
 
 					if ( t->Tag() != TYPE_FUNC ||
 					     t->AsFuncType()->Flavor() != FUNC_FLAVOR_FUNCTION )
