@@ -675,7 +675,7 @@ IntrusivePtr<Val> BinaryExpr::Fold(Val* v1, Val* v2) const
 	BroType* ret_type = Type();
 
 	if ( IsVector(ret_type->Tag()) )
-	     ret_type = ret_type->YieldType();
+	     ret_type = ret_type->Yield().get();
 
 	if ( ret_type->Tag() == TYPE_INTERVAL )
 		return make_intrusive<IntervalVal>(d3, 1.0);
@@ -862,9 +862,9 @@ void BinaryExpr::PromoteOps(TypeTag t)
 	bool is_vec2 = IsVector(bt2);
 
 	if ( is_vec1 )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 	if ( is_vec2 )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( (is_vec1 || is_vec2) && ! (is_vec1 && is_vec2) )
 		reporter->Warning("mixing vector and scalar operands is deprecated");
@@ -921,7 +921,7 @@ IncrExpr::IncrExpr(BroExprTag arg_tag, IntrusivePtr<Expr> arg_op)
 
 	if ( IsVector(t->Tag()) )
 		{
-		if ( ! IsIntegral(t->AsVectorType()->YieldType()->Tag()) )
+		if ( ! IsIntegral(t->AsVectorType()->Yield()->Tag()) )
 			ExprError("vector elements must be integral for increment operator");
 		else
 			{
@@ -955,7 +955,7 @@ IntrusivePtr<Val> IncrExpr::DoSingleEval(Frame* f, Val* v) const
 
 	BroType* ret_type = Type();
 	if ( IsVector(ret_type->Tag()) )
-		ret_type = Type()->YieldType();
+		ret_type = Type()->Yield().get();
 
 	if ( ret_type->Tag() == TYPE_INT )
 		return val_mgr->Int(k);
@@ -1049,7 +1049,7 @@ PosExpr::PosExpr(IntrusivePtr<Expr> arg_op)
 	BroType* t = op->Type();
 
 	if ( IsVector(t->Tag()) )
-		t = t->AsVectorType()->YieldType();
+		t = t->AsVectorType()->Yield().get();
 
 	TypeTag bt = t->Tag();
 	IntrusivePtr<BroType> base_result_type;
@@ -1087,7 +1087,7 @@ NegExpr::NegExpr(IntrusivePtr<Expr> arg_op)
 	BroType* t = op->Type();
 
 	if ( IsVector(t->Tag()) )
-		t = t->AsVectorType()->YieldType();
+		t = t->AsVectorType()->Yield().get();
 
 	TypeTag bt = t->Tag();
 	IntrusivePtr<BroType> base_result_type;
@@ -1152,12 +1152,12 @@ AddExpr::AddExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2)
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = op2->Type()->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	IntrusivePtr<BroType> base_result_type;
 
@@ -1208,7 +1208,7 @@ AddToExpr::AddToExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2)
 
 	else if ( IsVector(bt1) )
 		{
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 		if ( IsArithmetic(bt1) )
 			{
@@ -1278,11 +1278,11 @@ SubExpr::SubExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2)
 
 	TypeTag bt1 = t1->Tag();
 	if ( IsVector(bt1) )
-		bt1 = t1->AsVectorType()->YieldType()->Tag();
+		bt1 = t1->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = t2->Tag();
 	if ( IsVector(bt2) )
-		bt2 = t2->AsVectorType()->YieldType()->Tag();
+		bt2 = t2->AsVectorType()->Yield()->Tag();
 
 	IntrusivePtr<BroType> base_result_type;
 
@@ -1365,12 +1365,12 @@ TimesExpr::TimesExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2)
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = op2->Type()->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( bt1 == TYPE_INTERVAL || bt2 == TYPE_INTERVAL )
 		{
@@ -1402,12 +1402,12 @@ DivideExpr::DivideExpr(IntrusivePtr<Expr> arg_op1,
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = op2->Type()->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( bt1 == TYPE_INTERVAL || bt2 == TYPE_INTERVAL )
 		{
@@ -1469,12 +1469,12 @@ ModExpr::ModExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2)
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = op2->Type()->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( BothIntegral(bt1, bt2) )
 		PromoteType(max_type(bt1, bt2), is_vector(op1.get()) || is_vector(op2.get()));
@@ -1492,12 +1492,12 @@ BoolExpr::BoolExpr(BroExprTag arg_tag,
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = op2->Type()->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+		bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( BothBool(bt1, bt2) )
 		{
@@ -1642,12 +1642,12 @@ BitExpr::BitExpr(BroExprTag arg_tag,
 	TypeTag bt1 = t1->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = t1->AsVectorType()->YieldType()->Tag();
+		bt1 = t1->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = t2->Tag();
 
 	if ( IsVector(bt2) )
-		bt2 = t2->AsVectorType()->YieldType()->Tag();
+		bt2 = t2->AsVectorType()->Yield()->Tag();
 
 	if ( (bt1 == TYPE_COUNT || bt1 == TYPE_COUNTER) &&
 	     (bt2 == TYPE_COUNT || bt2 == TYPE_COUNTER) )
@@ -1696,11 +1696,11 @@ EqExpr::EqExpr(BroExprTag arg_tag,
 
 	TypeTag bt1 = t1->Tag();
 	if ( IsVector(bt1) )
-		bt1 = t1->AsVectorType()->YieldType()->Tag();
+		bt1 = t1->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = t2->Tag();
 	if ( IsVector(bt2) )
-		bt2 = t2->AsVectorType()->YieldType()->Tag();
+		bt2 = t2->AsVectorType()->Yield()->Tag();
 
 	if ( is_vector(op1.get()) || is_vector(op2.get()) )
 		SetType(make_intrusive<VectorType>(base_type(TYPE_BOOL)));
@@ -1798,11 +1798,11 @@ RelExpr::RelExpr(BroExprTag arg_tag,
 
 	TypeTag bt1 = t1->Tag();
 	if ( IsVector(bt1) )
-		bt1 = t1->AsVectorType()->YieldType()->Tag();
+		bt1 = t1->AsVectorType()->Yield()->Tag();
 
 	TypeTag bt2 = t2->Tag();
 	if ( IsVector(bt2) )
-		bt2 = t2->AsVectorType()->YieldType()->Tag();
+		bt2 = t2->AsVectorType()->Yield()->Tag();
 
 	if ( is_vector(op1.get()) || is_vector(op2.get()) )
 		SetType(make_intrusive<VectorType>(base_type(TYPE_BOOL)));
@@ -1850,7 +1850,7 @@ CondExpr::CondExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2,
 	TypeTag bt1 = op1->Type()->Tag();
 
 	if ( IsVector(bt1) )
-		bt1 = op1->Type()->AsVectorType()->YieldType()->Tag();
+		bt1 = op1->Type()->AsVectorType()->Yield()->Tag();
 
 	if ( op1->IsError() || op2->IsError() || op3->IsError() )
 		SetError();
@@ -1863,12 +1863,12 @@ CondExpr::CondExpr(IntrusivePtr<Expr> arg_op1, IntrusivePtr<Expr> arg_op2,
 		TypeTag bt2 = op2->Type()->Tag();
 
 		if ( is_vector(op2.get()) )
-			bt2 = op2->Type()->AsVectorType()->YieldType()->Tag();
+			bt2 = op2->Type()->AsVectorType()->Yield()->Tag();
 
 		TypeTag bt3 = op3->Type()->Tag();
 
 		if ( IsVector(bt3) )
-			bt3 = op3->Type()->AsVectorType()->YieldType()->Tag();
+			bt3 = op3->Type()->AsVectorType()->Yield()->Tag();
 
 		if ( is_vector(op1.get()) && ! (is_vector(op2.get()) && is_vector(op3.get())) )
 			{
@@ -2328,7 +2328,7 @@ void AssignExpr::EvalIntoAggregate(const BroType* t, Val* aggr, Frame* f) const
 	TableVal* tv = aggr->AsTableVal();
 
 	auto index = op1->Eval(f);
-	auto v = check_and_promote(op2->Eval(f), t->YieldType(), true);
+	auto v = check_and_promote(op2->Eval(f), t->Yield().get(), true);
 
 	if ( ! index || ! v )
 		return;
@@ -2394,10 +2394,10 @@ IntrusivePtr<Val> AssignExpr::InitVal(const BroType* t, IntrusivePtr<Val> aggr) 
 
 		auto tv = cast_intrusive<TableVal>(std::move(aggr));
 		const TableType* tt = tv->Type()->AsTableType();
-		const BroType* yt = tv->Type()->YieldType();
+		const auto& yt = tv->Type()->Yield();
 
 		auto index = op1->InitVal(tt->Indices(), nullptr);
-		auto v = op2->InitVal(yt, nullptr);
+		auto v = op2->InitVal(yt.get(), nullptr);
 
 		if ( ! index || ! v )
 			return nullptr;
@@ -2490,7 +2490,7 @@ IndexExpr::IndexExpr(IntrusivePtr<Expr> arg_op1,
 		SetError(error_msg.data());
 		}
 
-	else if ( ! op1->Type()->YieldType() )
+	else if ( ! op1->Type()->Yield() )
 		{
 		if ( IsString(op1->Type()->Tag()) && match_type == MATCHES_INDEX_SCALAR )
 			SetType(base_type(TYPE_STRING));
@@ -2503,10 +2503,10 @@ IndexExpr::IndexExpr(IntrusivePtr<Expr> arg_op1,
 		}
 
 	else if ( match_type == MATCHES_INDEX_SCALAR )
-		SetType({NewRef{}, op1->Type()->YieldType()});
+		SetType(op1->Type()->Yield());
 
 	else if ( match_type == MATCHES_INDEX_VECTOR )
-		SetType(make_intrusive<VectorType>(IntrusivePtr{NewRef{}, op1->Type()->YieldType()}));
+		SetType(make_intrusive<VectorType>(op1->Type()->Yield()));
 
 	else
 		ExprError("Unknown MatchesIndex() return value");
@@ -2594,7 +2594,7 @@ IntrusivePtr<Val> IndexExpr::Eval(Frame* f) const
 		auto v_result = make_intrusive<VectorVal>(Type()->AsVectorType());
 
 		// Booleans select each element (or not).
-		if ( IsBool(v_v2->Type()->YieldType()->Tag()) )
+		if ( IsBool(v_v2->Type()->Yield()->Tag()) )
 			{
 			if ( v_v1->Size() != v_v2->Size() )
 				{
@@ -3342,7 +3342,7 @@ VectorConstructorExpr::VectorConstructorExpr(IntrusivePtr<ListExpr> constructor_
 		}
 
 	if ( ! check_and_promote_exprs_to_type(op->AsListExpr(),
-					       type->AsVectorType()->YieldType()) )
+					       type->AsVectorType()->Yield().get()) )
 		ExprError("inconsistent types in vector constructor");
 	}
 
@@ -3382,7 +3382,7 @@ IntrusivePtr<Val> VectorConstructorExpr::InitVal(const BroType* t, IntrusivePtr<
 	loop_over_list(exprs, i)
 		{
 		Expr* e = exprs[i];
-		auto v = check_and_promote(e->Eval(nullptr), t->YieldType(), true);
+		auto v = check_and_promote(e->Eval(nullptr), t->Yield().get(), true);
 
 		if ( ! v || ! vec->Assign(i, std::move(v)) )
 			{
@@ -3460,7 +3460,7 @@ ArithCoerceExpr::ArithCoerceExpr(IntrusivePtr<Expr> arg_op, TypeTag t)
 	if ( IsVector(bt) )
 		{
 		SetType(make_intrusive<VectorType>(base_type(t)));
-		vbt = op->Type()->AsVectorType()->YieldType()->Tag();
+		vbt = op->Type()->AsVectorType()->Yield()->Tag();
 		}
 	else
 		SetType(base_type(t));
@@ -3505,12 +3505,12 @@ IntrusivePtr<Val> ArithCoerceExpr::Fold(Val* v) const
 		// invocation is being done per-element rather than on
 		// the whole vector.  Correct the type tag if necessary.
 		if ( type->Tag() == TYPE_VECTOR )
-			t = Type()->AsVectorType()->YieldType()->InternalType();
+			t = Type()->AsVectorType()->Yield()->InternalType();
 
 		return FoldSingleVal(v, t);
 		}
 
-	t = Type()->AsVectorType()->YieldType()->InternalType();
+	t = Type()->AsVectorType()->Yield()->InternalType();
 
 	VectorVal* vv = v->AsVectorVal();
 	auto result = make_intrusive<VectorVal>(Type()->AsVectorType());
@@ -4081,7 +4081,7 @@ CallExpr::CallExpr(IntrusivePtr<Expr> arg_func,
 		SetError("argument type mismatch in function call");
 	else
 		{
-		BroType* yield = func_type->YieldType();
+		const auto& yield = func_type->Yield();
 
 		if ( ! yield )
 			{
@@ -4109,7 +4109,7 @@ CallExpr::CallExpr(IntrusivePtr<Expr> arg_func,
 			}
 			}
 		else
-			SetType({NewRef{}, yield});
+			SetType(yield);
 
 		// Check for call to built-ins that can be statically analyzed.
 		IntrusivePtr<Val> func_val;
@@ -4384,7 +4384,7 @@ EventExpr::EventExpr(const char* arg_name, IntrusivePtr<ListExpr> arg_args)
 		SetError("argument type mismatch in event invocation");
 	else
 		{
-		if ( func_type->YieldType() )
+		if ( func_type->Yield() )
 			{
 			Error("function invoked as an event");
 			SetError();
@@ -4632,7 +4632,7 @@ IntrusivePtr<Val> ListExpr::InitVal(const BroType* t, IntrusivePtr<Val> aggr) co
 		loop_over_list(exprs, i)
 			{
 			Expr* e = exprs[i];
-			auto promoted_e = check_and_promote_expr(e, vec->Type()->AsVectorType()->YieldType());
+			auto promoted_e = check_and_promote_expr(e, vec->Type()->AsVectorType()->Yield().get());
 
 			if ( promoted_e )
 				e = promoted_e.get();
