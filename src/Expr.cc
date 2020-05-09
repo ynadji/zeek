@@ -360,7 +360,7 @@ IntrusivePtr<Val> UnaryExpr::Eval(Frame* f) const
 		else
 			out_t = Type()->AsVectorType();
 
-		auto result = make_intrusive<VectorVal>(out_t);
+		auto result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, out_t});
 
 		for ( unsigned int i = 0; i < v_op->Size(); ++i )
 			{
@@ -453,7 +453,7 @@ IntrusivePtr<Val> BinaryExpr::Eval(Frame* f) const
 			return nullptr;
 			}
 
-		auto v_result = make_intrusive<VectorVal>(Type()->AsVectorType());
+		auto v_result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 
 		for ( unsigned int i = 0; i < v_op1->Size(); ++i )
 			{
@@ -470,7 +470,7 @@ IntrusivePtr<Val> BinaryExpr::Eval(Frame* f) const
 	if ( IsVector(Type()->Tag()) && (is_vec1 || is_vec2) )
 		{ // fold vector against scalar
 		VectorVal* vv = (is_vec1 ? v1 : v2)->AsVectorVal();
-		auto v_result = make_intrusive<VectorVal>(Type()->AsVectorType());
+		auto v_result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 
 		for ( unsigned int i = 0; i < vv->Size(); ++i )
 			{
@@ -1582,7 +1582,7 @@ IntrusivePtr<Val> BoolExpr::Eval(Frame* f) const
 
 		if ( scalar_v->IsZero() == is_and )
 			{
-			result = make_intrusive<VectorVal>(Type()->AsVectorType());
+			result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 			result->Resize(vector_v->Size());
 			result->AssignRepeat(0, result->Size(), scalar_v.get());
 			}
@@ -1607,7 +1607,7 @@ IntrusivePtr<Val> BoolExpr::Eval(Frame* f) const
 		return nullptr;
 		}
 
-	auto result = make_intrusive<VectorVal>(Type()->AsVectorType());
+	auto result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 	result->Resize(vec_v1->Size());
 
 	for ( unsigned int i = 0; i < vec_v1->Size(); ++i )
@@ -1939,7 +1939,7 @@ IntrusivePtr<Val> CondExpr::Eval(Frame* f) const
 		return nullptr;
 		}
 
-	auto result = make_intrusive<VectorVal>(Type()->AsVectorType());
+	auto result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 	result->Resize(cond->Size());
 
 	for ( unsigned int i = 0; i < cond->Size(); ++i )
@@ -2591,7 +2591,7 @@ IntrusivePtr<Val> IndexExpr::Eval(Frame* f) const
 		{
 		VectorVal* v_v1 = v1->AsVectorVal();
 		VectorVal* v_v2 = indv->AsVectorVal();
-		auto v_result = make_intrusive<VectorVal>(Type()->AsVectorType());
+		auto v_result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 
 		// Booleans select each element (or not).
 		if ( IsBool(v_v2->Type()->Yield()->Tag()) )
@@ -2658,7 +2658,7 @@ IntrusivePtr<Val> IndexExpr::Fold(Val* v1, Val* v2) const
 		else
 			{
 			size_t len = vect->Size();
-			auto result = make_intrusive<VectorVal>(vect->Type()->AsVectorType());
+			auto result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, vect->Type()->AsVectorType()});
 
 			bro_int_t first = get_slice_index(lv->Idx(0)->CoerceToInt(), len);
 			bro_int_t last = get_slice_index(lv->Idx(1)->CoerceToInt(), len);
@@ -3351,7 +3351,7 @@ IntrusivePtr<Val> VectorConstructorExpr::Eval(Frame* f) const
 	if ( IsError() )
 		return nullptr;
 
-	auto vec = make_intrusive<VectorVal>(Type()->AsVectorType());
+	auto vec = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 	const expr_list& exprs = op->AsListExpr()->Exprs();
 
 	loop_over_list(exprs, i)
@@ -3376,7 +3376,7 @@ IntrusivePtr<Val> VectorConstructorExpr::InitVal(const BroType* t, IntrusivePtr<
 	VectorType* vt = Type()->AsVectorType();
 	auto vec = aggr ?
 	        IntrusivePtr<VectorVal>{AdoptRef{}, aggr.release()->AsVectorVal()} :
-	        make_intrusive<VectorVal>(vt);
+	        make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, vt});
 	const expr_list& exprs = op->AsListExpr()->Exprs();
 
 	loop_over_list(exprs, i)
@@ -3513,7 +3513,7 @@ IntrusivePtr<Val> ArithCoerceExpr::Fold(Val* v) const
 	t = Type()->AsVectorType()->Yield()->InternalType();
 
 	VectorVal* vv = v->AsVectorVal();
-	auto result = make_intrusive<VectorVal>(Type()->AsVectorType());
+	auto result = make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 
 	for ( unsigned int i = 0; i < vv->Size(); ++i )
 		{
@@ -3793,7 +3793,7 @@ IntrusivePtr<Val> VectorCoerceExpr::Fold(Val* v) const
 	if ( vv->Size() > 0 )
 		RuntimeErrorWithCallStack("coercion of non-empty vector");
 
-	return make_intrusive<VectorVal>(Type()->Ref()->AsVectorType());
+	return make_intrusive<VectorVal>(IntrusivePtr{NewRef{}, Type()->AsVectorType()});
 	}
 
 FlattenExpr::FlattenExpr(IntrusivePtr<Expr> arg_op)
