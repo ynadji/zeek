@@ -173,6 +173,10 @@ export {
 		## Interpretation of the values is left to the reader, but
 		## usually they will be used for configuration purposes.
 		config: table[string] of string &default=table();
+
+		## If true and using the ASCII reader, transparently decompress
+		## gzipped source files. The source must have a .gz extension for safety.
+		decompress: bool &default=F;
 	};
 
 	## A file analysis input stream type used to forward input data to the

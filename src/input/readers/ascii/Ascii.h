@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <zlib.h>
 
 #include "zeek/Obj.h"
 #include "zeek/input/ReaderBackend.h"
@@ -62,9 +63,19 @@ private:
     bool GetLine(std::string& str);
     bool OpenFile();
 
+    // Gzip support
+    bool OpenGzipFile(const char* fname);
+    bool GetLineGzip(std::string& str);
+    void CloseGzipFile();
+
     std::ifstream file;
     time_t mtime;
     ino_t ino;
+
+    // Gzip decompression members
+    gzFile gzfile = nullptr;
+    bool use_gzip = false;
+    std::string gzbuffer;
 
     // The name using which we actually load the file -- compared
     // to the input source name, this one may have a path_prefix

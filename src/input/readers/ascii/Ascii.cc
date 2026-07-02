@@ -57,9 +57,19 @@ Ascii::Ascii(ReaderFrontend* frontend) : ReaderBackend(frontend) {
     ino = 0;
     fail_on_file_problem = false;
     fail_on_invalid_lines = false;
+    gzbuffer.reserve(8192); // Pre-allocate buffer for gzip line reading
 }
 
-void Ascii::DoClose() { read_location.reset(); }
+void Ascii::DoClose() {
+    if ( use_gzip ) {
+        CloseGzipFile();
+    }
+    else if ( file.is_open() ) {
+        file.close();
+    }
+
+    read_location.reset();
+}
 
 bool Ascii::DoInit(const ReaderInfo& info, int num_fields, const Field* const* fields) {
     StopWarningSuppression();
@@ -101,6 +111,17 @@ bool Ascii::DoInit(const ReaderInfo& info, int num_fields, const Field* const* f
 
         else if ( strcmp(k, "fail_on_file_problem") == 0 )
             fail_on_file_problem = (strncmp(v, "T", 1) == 0);
+
+        else if ( strcmp(k, "decompress") == 0 && strncmp(v, "T", 1) == 0 ) {
+            // Validate .gz extension for safety
+            string source(info.source);
+            if ( source.length() > 3 && source.substr(source.length() - 3) == ".gz" )
+                use_gzip = true;
+            else {
+                Error(Fmt("Decompression requested but source '%s' doesn't have .gz extension", info.source));
+                return false;
+            }
+        }
     }
 
     if ( separator.size() != 1 )
@@ -116,6 +137,9 @@ bool Ascii::DoInit(const ReaderInfo& info, int num_fields, const Field* const* f
 }
 
 bool Ascii::OpenFile() {
+    if ( use_gzip )
+        return OpenGzipFile(Info().source);
+
     if ( file.is_open() )
         return true;
 
@@ -228,6 +252,9 @@ bool Ascii::ReadHeader(bool useCached) {
 }
 
 bool Ascii::GetLine(string& str) {
+    if ( use_gzip )
+        return GetLineGzip(str);
+
     while ( getline(file, str) ) {
         if ( read_location ) {
             read_location->IncrementLine();
@@ -266,7 +293,11 @@ bool Ascii::DoUpdate() {
             if ( stat(fname.c_str(), &sb) == -1 ) {
                 FailWarn(fail_on_file_problem, Fmt("Could not get stat for %s", fname.c_str()), true);
 
-                file.close();
+                if ( use_gzip )
+                    CloseGzipFile();
+                else
+                    file.close();
+
                 return ! fail_on_file_problem;
             }
 
@@ -289,9 +320,14 @@ bool Ascii::DoUpdate() {
         case MODE_STREAM: {
             // dirty, fix me. (well, apparently after trying seeking, etc
             // - this is not that bad)
-            if ( file.is_open() ) {
+            bool is_open = use_gzip ? (gzfile != nullptr) : file.is_open();
+
+            if ( is_open ) {
                 if ( Info().mode == MODE_STREAM ) {
-                    file.clear(); // remove end of file evil bits
+                    if ( ! use_gzip )
+                        file.clear(); // remove end of file evil bits
+                    // For gzip, can't seek back, so just continue reading
+
                     if ( ! ReadHeader(true) ) {
                         return ! fail_on_file_problem; // header reading failed
                     }
@@ -299,7 +335,10 @@ bool Ascii::DoUpdate() {
                     break;
                 }
 
-                file.close();
+                if ( use_gzip )
+                    CloseGzipFile();
+                else
+                    file.close();
             }
 
             OpenFile();
@@ -312,7 +351,8 @@ bool Ascii::DoUpdate() {
 
     string line;
 
-    file.sync();
+    if ( ! use_gzip )
+        file.sync();
 
     while ( GetLine(line) ) {
         // split on tabs
@@ -428,6 +468,118 @@ bool Ascii::DoHeartbeat(double network_time, double current_time) {
     }
 
     return true;
+}
+
+bool Ascii::OpenGzipFile(const char* source) {
+    if ( gzfile != nullptr )
+        return true; // Already open
+
+    // Handle path-prefixing
+    fname = source;
+
+    if ( fname.front() != '/' && ! path_prefix.empty() ) {
+        std::size_t last = path_prefix.find_last_not_of('/');
+
+        string path;
+        if ( last == string::npos )
+            path = "/";
+        else
+            path = path_prefix.substr(0, last + 1);
+
+        fname = util::fmt("%s/%s", path.c_str(), fname.c_str());
+    }
+
+    gzfile = gzopen(fname.c_str(), "rb");
+
+    if ( gzfile == nullptr ) {
+        FailWarn(fail_on_file_problem, Fmt("Init: cannot open gzip file %s", fname.c_str()), true);
+        return false;
+    }
+
+    // Set reasonable buffer size for performance (128KB)
+    gzbuffer(gzfile, 131072);
+
+    if ( ReadHeader(false) == false ) {
+        FailWarn(fail_on_file_problem, Fmt("Init: cannot open %s; problem reading file header", fname.c_str()), true);
+        CloseGzipFile();
+        return false;
+    }
+
+    if ( ! read_location ) {
+        read_location = LocationPtr(new zeek::detail::Location());
+        read_location->SetFile(util::copy_string(fname.c_str(), fname.size()));
+    }
+
+    StopWarningSuppression();
+    return true;
+}
+
+bool Ascii::GetLineGzip(string& str) {
+    str.clear();
+    gzbuffer.clear();
+
+    const int bufsize = 8192;
+    char buffer[bufsize];
+
+    while ( true ) {
+        char* result = gzgets(gzfile, buffer, bufsize);
+
+        if ( result == nullptr ) {
+            // Check if EOF or error
+            int errnum;
+            const char* errmsg = gzerror(gzfile, &errnum);
+
+            if ( errnum == Z_OK || errnum == Z_STREAM_END )
+                return false; // EOF
+
+            Error(Fmt("Gzip read error: %s (code %d)", errmsg, errnum));
+            return false;
+        }
+
+        gzbuffer.append(buffer);
+
+        // Check if we have a complete line
+        size_t len = gzbuffer.length();
+        if ( len > 0 && gzbuffer[len - 1] == '\n' ) {
+            // Remove newline
+            gzbuffer.resize(len - 1);
+            if ( len > 1 && gzbuffer[len - 2] == '\r' )
+                gzbuffer.resize(len - 2); // Remove \r\n
+
+            str = gzbuffer;
+
+            if ( read_location ) {
+                read_location->IncrementLine();
+            }
+
+            // Skip empty lines
+            if ( str.empty() )
+                continue;
+
+            // Skip comment lines, but handle special #fields line
+            if ( str[0] == '#' ) {
+                if ( (str.length() > 8) && str.starts_with("#fields") && (str[7] == separator[0]) ) {
+                    str = str.substr(8);
+                    return true;
+                }
+                continue;
+            }
+
+            return true;
+        }
+    }
+}
+
+void Ascii::CloseGzipFile() {
+    if ( gzfile != nullptr ) {
+        int res = gzclose(gzfile);
+
+        if ( res != Z_OK ) {
+            Error(Fmt("Error closing gzip file: %d", res));
+        }
+
+        gzfile = nullptr;
+    }
 }
 
 } // namespace zeek::input::reader::detail

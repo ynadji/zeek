@@ -234,6 +234,15 @@ bool Manager::CreateStream(Stream* info, RecordVal* description) {
         }
     }
 
+    // Handle the decompress boolean field if present (EventDescription only)
+    if ( same_type(rtype, BifType::Record::Input::EventDescription, false) ) {
+        auto decompress_val = description->GetFieldOrDefault("decompress");
+        if ( decompress_val && decompress_val->AsBool() ) {
+            rinfo.config.insert(std::make_pair(util::copy_string("decompress", 10),
+                                               util::copy_string("T", 1)));
+        }
+    }
+
     ReaderFrontend* reader_obj = new ReaderFrontend(rinfo, reader->AsEnumVal());
     assert(reader_obj);
 
